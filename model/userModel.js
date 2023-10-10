@@ -20,27 +20,19 @@ module.exports = {
                 foreignField: "_id",
                 as: "cart"
               }
-            },
-            {
-                $project: {
-                
-                  cart: {
-                    quantity:"$quantity",
-                    $filter: {
-                      input: "$cart",
-                      as: "item",
-                      cond: { $ne: ["$$item.product.status", false] }
-                    }
-                  },
-
-                }
             }
           ]).toArray()
-        console.log("user");
-          console.log(user);
-        
 
-        //    return user[0].cart
+        const cart = await db_user.findOne({_id:ObjectId(id)}) 
+          console.log("user");
+          console.log(user[0]);
+          user[0].cart.forEach(data => {
+            
+
+            
+          });
+
+            return user[0].cart
         //   return user
     },
     async addTocart(user_id, product_id, quantity) {
@@ -53,7 +45,6 @@ module.exports = {
 
             //     }
             //   }
-            console.log("goooooooooooooooooooooooooooooooooooooot");
             return await db_user.updateOne({ _id: new ObjectId(user_id) }, { $push: { cart: { _id: new ObjectId(product_id), quantity } } })
         } catch (err) {
             throw err
