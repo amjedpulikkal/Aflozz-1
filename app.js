@@ -25,7 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json())
 app.use("/admin",adminRouter)
 app.use("/",userRouter)
-
+app.all("/*",(req,res)=>res.render("404",{layout:"login/layout"}))
 
 
 app.listen(process.env.PORT,()=>{

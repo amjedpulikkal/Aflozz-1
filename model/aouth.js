@@ -1,13 +1,13 @@
-const user = require("../module/db").db_user
+const user = require("./db").db_user
 const { ObjectId } = require("mongodb");
 
 
 async function ifuser(req, res, next) {
     if (req.session.user) {
-        console.log(req.session.user)
         const _id = req.session.user._id
         const data = await user.findOne({ _id: new ObjectId(_id), status: true })
         console.log(data);
+        // req.session.user = data
         if (data) {
 
             next()
@@ -42,10 +42,9 @@ function noadmin(req, res, next) {
 }
 const sharp = require("sharp")
 const path = require("path")
-const db = require("../module/db")
+const db = require("./db")
 async function sharp_cat(req, res, next) {
     if(req.file){
-
         const imageName = `${Date.now()}${Math.round() * 1000}${req.file.originalname}`
         req.body.image = imageName
         sharp(req.file.buffer).resize(300, 300).toFile(path.join(__dirname, "../public/image/products/", imageName), (err, info) => {

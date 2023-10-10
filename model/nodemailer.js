@@ -1,5 +1,5 @@
 const nodemailer = require("nodemailer")
- const jwt = require("../module/JWT")
+ const jwt = require("./JWT")
 
 
 const transport = nodemailer.createTransport({
@@ -67,7 +67,7 @@ function sendmail(userEmail, otp, name) {
 
 function sendmailForPassword(userEmail,name) {
   const link = jwt.create_token({Email:userEmail})
-  console.log("email");
+  console.log(link);
   console.log(userEmail);
   const maile = {
     from: "aflozz010@gmail.com",
