@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+
 <html lang="en">
 
 <head>
@@ -7,8 +7,10 @@
   <title>
     <%=titel%>
   </title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="/style.css">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/cdn.js"></script>
+  <link rel="stylesheet" href="/lorder.css">
   <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
   <style>
     .group-3 {
@@ -42,7 +44,7 @@
           </a>
           <!-- Nav Links -->
           <ul class="hidden md:flex px-4 mx-auto font-semibold font-heading space-x-12">
-            <li><a class="hover:text-gray-200" href="#">Home</a></li>
+            <li><a class="hover:text-gray-200" href="/">Home</a></li>
             <li><a class="hover:text-gray-200" href="/category">Catagory</a></li>
             <li><a class="hover:text-gray-200" href="#">Collections</a></li>
             <li><a class="hover:text-gray-200" href="#">Contact Us</a></li>
@@ -56,7 +58,7 @@
                   d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
               </svg>
             </a>
-            <a class="flex items-center hover:text-gray-200" href="#">
+            <a class="flex items-center hover:text-gray-200" href="/cart">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -81,7 +83,7 @@
               </button>
 
               <!-- Dropdown content -->
-              <div x-show="isOpen" x-transition:enter="transition ease-out duration-100 transform opacity-0 scale-95"
+              <div x-show="isOpen"  x-transition:enter="transition ease-out  duration-100 transform opacity-0 scale-95"
                 x-transition:enter-start="transform opacity-0 scale-95"
                 x-transition:enter-end="transform opacity-100 scale-100"
                 x-transition:leave="transition ease-in duration-75 transform opacity-100 scale-100"
@@ -91,10 +93,10 @@
                 role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
                 <div class="py-1" role="none">
                   <!-- Dropdown items -->
-                  <a href="#" class="text-gray-700 block px-4 py-2 text-sm" role="menuitem" tabindex="-1"
+                  <a href="/account" class="text-gray-700 block px-4 py-2 text-sm" role="menuitem" tabindex="-1"
                     id="menu-item-0">Account settings</a>
-                  <a href="#" class="text-gray-700 block px-4 py-2 text-sm" role="menuitem" tabindex="-1"
-                    id="menu-item-1">Support</a>
+                  <a href="/account/orders" class="text-gray-700 block px-4 py-2 text-sm" role="menuitem" tabindex="-1"
+                    id="menu-item-1">Orders</a>
                   <a href="#" class="text-gray-700 block px-4 py-2 text-sm" role="menuitem" tabindex="-1"
                     id="menu-item-2">License</a>
                   <form method="POST" action="/logout" role="none">
@@ -132,4 +134,5 @@
     </section>
   </div>
   <%- body %>
-  
+
+  </html>

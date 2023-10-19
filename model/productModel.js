@@ -1,4 +1,4 @@
-const {db_product} = require("./db")
+const { db_product } = require("./db")
 const { ObjectId } = require("mongodb");
 
 
@@ -14,13 +14,16 @@ module.exports = {
 
     async add_product(data) {
         try {
+            data.price = Number(data.price)
+            data.discount = Number(data.discount)
+            data.stock = Number(data.stock)
             return await db_product.insertOne(data)
         } catch (errr) {
             console.log(errr);
             throw errr
         }
     },
-async find_product(data) {
+    async find_product(data) {
         try {
             return await db_product.find({}).toArray()
         } catch (errr) {
@@ -28,7 +31,7 @@ async find_product(data) {
             throw errr
         }
     },
-async ufind_product(data) {
+    async ufind_product(data) {
         try {
             return await db_product.find({ $and: [{ stock: { $ne: "0" } }, { status: true }] }).toArray()
         } catch (errr) {
@@ -36,7 +39,7 @@ async ufind_product(data) {
             throw errr
         }
     },
-async ufind_category(data) {
+    async ufind_category(data) {
         try {
             return await db_category.find().toArray()
         } catch (errr) {
@@ -44,15 +47,18 @@ async ufind_category(data) {
             throw errr
         }
     },
-async findOne_product(id) {
+    async findOne_product(id) {
         try {
+            console.log(id);
+
             return await db_product.findOne({ _id: new ObjectId(id) })
+
         } catch (errr) {
             console.log(errr);
             throw errr
         }
     },
-async update_product(data) {
+    async update_product(data) {
         try {
             const id = data.id
             delete data._id
@@ -60,6 +66,7 @@ async update_product(data) {
             delete data.image
             console.log(id);
             console.log(data);
+            data.stock = Number(data.stock)
             console.log(image);
             console.log(new ObjectId(id));
             await db_product.updateOne({ _id: new ObjectId(id) }, { $set: data }).then(async e => {
@@ -71,7 +78,7 @@ async update_product(data) {
             throw errr
         }
     },
-async delete_product(id) {
+    async delete_product(id) {
         try {
             return await db_product.deleteOne({ _id: new ObjectId(id) })
         } catch (errr) {
@@ -80,7 +87,7 @@ async delete_product(id) {
         }
     },
 
-async update_status(data) {
+    async update_status(data) {
 
         try {
             if (data.status === "true") {

@@ -9,13 +9,22 @@ async function ifuser(req, res, next) {
         console.log(data);
         // req.session.user = data
         if (data) {
-
-            next()
+            if(req.session.url){
+                const url = req.session.url
+                req.session.url = null 
+                res.redirect(url)
+                
+            }else{
+                req.session.user = data
+                next()
+            }
         } else {
             req.session.user = null
             res.redirect("/login")
         }
     } else {
+        req.session.url = req.url
+        console.log(req.url);
         res.redirect("/login")
     }
 }
@@ -42,7 +51,6 @@ function noadmin(req, res, next) {
 }
 const sharp = require("sharp")
 const path = require("path")
-const db = require("./db")
 async function sharp_cat(req, res, next) {
     if(req.file){
         const imageName = `${Date.now()}${Math.round() * 1000}${req.file.originalname}`

@@ -1,6 +1,7 @@
 const productModel = require("../model/productModel")
 const categoryModel = require("../model/categoryModel")
-
+const fs = require("fs")
+const  path = require("path")
 module.exports ={
 
     getProducts:async (req, res) => {
@@ -21,7 +22,7 @@ module.exports ={
                 console.log("No files uploaded");
             } else {
                 let data = req.body
-                console.log(data.image);
+                console.log(data);
                 await productModel.add_product(data)
                 res.redirect("/admin/products")
             }
@@ -70,6 +71,9 @@ module.exports ={
         try {
             console.log(req.files);
             const data = req.body
+            data.price = Number(data.price)
+            data.discount = Number(data.discount)
+            console.log(data);
             productModel.update_product(data).then(d => {
                 res.redirect("/admin/products")
             })

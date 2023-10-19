@@ -1,52 +1,302 @@
 const { ObjectId } = require("mongodb");
-const { db_user } = require("./db");
+const { db_user, db_order, db_product } = require("./db");
 const { decryption, encryption } = require("./crypto");
-
 
 // Other required modules and dependencies
 
 module.exports = {
+    async degress(product) {
+
+    },
+    async findaddress(id, index) {
+        const user = await db_user.findOne({ _id: new ObjectId(id) })
+
+        return user.address[index]
+    },
+    async changePassword(id, data) {
+
+
+        const userData = await db_user.findOne({ _id: new ObjectId(id) })
+        const password = decryption(userData.Password)
+        console.log(password);
+        console.log(data.oldPassword);
+        if (password === data.oldPassword) {
+            const Password = encryption(data.Password)
+            return await db_user.updateOne({ _id: new ObjectId(id) }, { $set: { Password } })
+        } else {
+
+            throw "Password is incorrect"
+        }
+
+
+    },
+    async cancelOrder(id) {
+
+        const product = await db_order.findOneAndUpdate({ _id: new ObjectId(id) }, { $set: { cancel: true } })
+        product.value.products.forEach(async (element) => {
+            const n = element.quantity
+            await db_product.updateOne({ _id: element._id }, { $inc: { stock: n } })
+        });
+        return product
+    },
+    async removeAddress(id, index) {
+        await db_user.updateOne({ _id: new ObjectId(id) }, { $unset: { [`address.${index}`]: 1 } })
+        await db_user.updateOne({ _id: new ObjectId(id) }, { $pull: { address: null } })
+        return null
+
+    },
+    async updateOrderStatus(id, data) {
+
+        return await db_order.updateOne({ _id: new ObjectId(id) }, { $push: { status: data } })
+    },
+    async orderDetails(id) {
+        return await db_order.findOne({ _id: new ObjectId(id) })
+    },
+    async orderProduct(id) {
+        const order = await db_order.aggregate([
+            {
+                $match: {
+                    "_id": new ObjectId(id)
+                }
+            },
+            {
+                $unwind: "$products"
+            },
+            {
+                $lookup: {
+                    from: "products",
+                    localField: "products._id",
+                    foreignField: "_id",
+                    as: "product"
+                }
+            },
+            {
+                $unwind: "$product"
+            },
+            {
+                $group: {
+                    _id: "$_id",
+                    products: {
+                        $push: {
+                            _id: "$product._id",
+                            name: "$product.name",
+                            brand: "$product.brand",
+                            price: "$product.price",
+                            discount: "$product.discount",
+                            quantity: "$products.quantity",
+                            image: "$product.image"
+                        }
+                    }
+                }
+            }]).toArray()
+        console.log(order[0].products);
+
+        return order[0].products
+
+    }
+    ,
+    async getOrders(id) {
+
+        return await db_order.find({ user_id: new ObjectId(id) }).sort({ date: -1 }).toArray()
+
+    },
+
+    async removeCart(id) {
+        return await db_user.updateOne({ _id: new ObjectId(id) }, { $set: { cart: [] } })
+    }
+    ,
+    async orderAddres(id, index) {
+        const address = db_user.aggregate([
+            { $match: { _id: new ObjectId(id) } },
+            {
+                $project: {
+                    valueAtIndex2: { $arrayElemAt: ["$address", index] }
+                }
+            }
+        ]).toArray()
+        return address
+
+    },
+    async getAmount(id) {
+        const user = await db_user.aggregate([
+            {
+                $match: {
+                    "_id": new ObjectId(id)
+                }
+            },
+            {
+                $unwind: "$cart"
+            },
+            {
+                $lookup: {
+                    from: "products",
+                    localField: "cart._id",
+                    foreignField: "_id",
+                    as: "product"
+                }
+            },
+            {
+                $unwind: "$product"
+            },
+            {
+                $group: {
+                    _id: "$_id",
+                    cart: {
+                        $push: {
+                            _id: "$product._id",
+                            price: "$product.price",
+                            discount: "$product.discount",
+                            quantity: "$cart.quantity"
+                        }
+                    }
+                }
+            },
+            {
+                $project: {
+                    totalDiscountedMRP: {
+                        $sum: {
+                            $map: {
+                                input: "$cart",
+                                as: "item",
+                                in: {
+                                    $multiply: [
+                                        {
+                                            $subtract: ["$$item.price", { $multiply: ["$$item.price", { $divide: ["$$item.discount", 100] }] }]
+                                        },
+                                        "$$item.quantity"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        ]).toArray()
+
+        // Access the total discounted MRP from the aggregation result
+        const totalDiscountedMRP = user[0]?.totalDiscountedMRP;
+
+        console.log(totalDiscountedMRP);
+        return totalDiscountedMRP
+    },
+    async newAdress(id, data) {
+        return await db_user.updateOne({ _id: new ObjectId(id) }, { $push: { address: data } })
+    },
+    async newOrder(user_id, data) {
+        data.date = new Date()
+        data.user_id = new ObjectId(user_id)
+        console.log(data.products);
+        data.products.forEach(async (element) => {
+            const n = element.quantity
+            await db_product.updateOne({ _id: element._id }, { $inc: { stock: -n } })
+        });
+        return await db_order.insertOne(data)
+    },
+    async cartRemove(user_id, pro_id) {
+        return await db_user.updateOne({ _id: new ObjectId(user_id) }, { $pull: { cart: { _id: new ObjectId(pro_id) } } })
+    },
     async findCart(id) {
         const user = await db_user.aggregate([
             {
-              $match: {
-                "_id": new ObjectId(id)
-              }
+                $match: {
+                    "_id": new ObjectId(id)
+                }
             },
             {
-              $lookup: {
-                from: "products",
-                localField: "cart._id",
-                foreignField: "_id",
-                as: "cart"
-              }
+                $unwind: "$cart" // Unwind the cart array
+            },
+            {
+                $lookup: {
+                    from: "products",
+                    localField: "cart._id",
+                    foreignField: "_id",
+                    as: "product"
+                }
+            },
+            {
+                $unwind: "$product"
+            },
+            {
+                $group: {
+                    _id: "$_id",
+                    cart: {
+                        $push: {
+                            _id: "$product._id",
+                            name: "$product.name",
+                            category: "$product.category",
+                            brand: "$product.brand",
+                            price: "$product.price",
+                            discount: "$product.discount",
+                            stock: "$product.stock",
+                            details: "$product.details",
+                            image: "$product.image",
+                            status: "$product.status",
+                            quantity: "$cart.quantity"
+                        }
+                    }
+                }
             }
-          ]).toArray()
+        ]).toArray()
 
-        const cart = await db_user.findOne({_id:ObjectId(id)}) 
-          console.log("user");
-          console.log(user[0]);
-          user[0].cart.forEach(data => {
-            
-
-            
-          });
+        // const cart = await db_user.findOne({ _id: new ObjectId(id) })
+        // console.log(cart);
+        console.log(user[0]);
+        if (user[0]) {
 
             return user[0].cart
-        //   return user
+        }
+        return null
+
     },
     async addTocart(user_id, product_id, quantity) {
         try {
-            //   const data =  await db_user.findOne({_id:new ObjectId(user_id)},{
-            //     cart: { $elemMatch: {_id:idToFind } }
-            //   })
-            //   if (data) {
-            //     if (data.) {
+            const cursor = db_user.aggregate([
+                {
+                    $match: {
+                        _id: new ObjectId(user_id)
+                    }
+                },
+                {
+                    $project: {
+                        cart: {
+                            $filter: {
+                                input: '$cart',
+                                as: 'item',
+                                cond: { $eq: ['$$item._id', new ObjectId(product_id)] }
+                            }
+                        }
+                    }
+                },
+                {
+                    $unwind: "$cart"
+                },
+                {
+                    $project: {
+                        _id: "$cart._id",
+                        quantity: "$cart.quantity"
+                    }
+                }
+            ]);
 
-            //     }
-            //   }
-            return await db_user.updateOne({ _id: new ObjectId(user_id) }, { $push: { cart: { _id: new ObjectId(product_id), quantity } } })
+            const data = await cursor.toArray();
+            console.log(data)
+            if (!quantity) {
+                if (data.length > 0) {
+                    if (data[0].quantity < 5) {
+                        console.log("yes----------------")
+                        return await db_user.updateOne({ _id: new ObjectId(user_id), 'cart._id': new ObjectId(product_id) }, { $inc: { 'cart.$.quantity': 1 } })
+                    } else {
+                        throw "limet"
+                    }
+                } else {
+                    console.log("no----------------")
+                    return await db_user.updateOne({ _id: new ObjectId(user_id) }, { $push: { cart: { _id: new ObjectId(product_id), quantity: 1 } } })
+                }
+            } else {
+                return await db_user.updateOne({ _id: new ObjectId(user_id), "cart._id": new ObjectId(product_id) }, { $set: { 'cart.$.quantity': Number(quantity) } })
+            }
         } catch (err) {
+            console.log("err");
             throw err
 
         }

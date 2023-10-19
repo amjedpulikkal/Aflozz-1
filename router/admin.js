@@ -44,6 +44,10 @@ router.get("/unlist", ifadmin,categoryCantroller.unlist)
 router.get("/all-user", ifadmin, userCantroller.getAll)
 router.get("/block", ifadmin, userCantroller.block)
 
+router.get("/orders",ifadmin,adminController.getOrder)
+router.get("/orders/:id",ifadmin,adminController.orderD)
+router.post("/orders/update/:id",ifadmin,adminController.updateOrder)
+
 
 router.get("/logout", ifadmin, async (req, res) => {
     req.session.admin = null

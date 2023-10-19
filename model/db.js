@@ -29,9 +29,11 @@ connect()
 const db_user = clint.db(db).collection("user")
 const db_admin = clint.db(db).collection("admin")
 const db_product = clint.db(db).collection("products")
+const db_order = clint.db(db).collection("order")
 const db_category = clint.db(db).collection("category")
 const db_otp = clint.db(db).collection("Otp")
 module.exports = {
+    db_order,
     db_user,
     db_admin,
     db_product,

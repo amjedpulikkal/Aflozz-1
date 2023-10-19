@@ -1,0 +1,29 @@
+<link rel="stylesheet" href="/profile-style.css">
+
+<div class="profile-header" style="z-index: -1;">
+    <!-- <div class="profile-img">
+        <img src="" width="200" alt="Profile Image">
+    </div> -->
+    <div class="profile-nav-info ms-10">
+        <h3 class="user-name"><%=user.Name%></h3>
+        <div class="address">
+            <p id="state" class="state"><%=user.Email%></p>
+            <!-- <span id="country" class="country"></span> -->
+        </div>
+
+    </div>
+</div>
+<div class="main-bd">
+    <div class="right-side">
+       <div class="right-side">
+    <div class="nav">
+        <ul>
+            <li onclick="tabs(2)" class="user-setting <%= (selection === 'profile') ? 'active' : '' %>"><a href="/account/profile">Edit Profile </a></li>
+            <li onclick="tabs(0)" class="user-post <%= (selection === 'address') ? 'active' : '' %>"><a href="/account">Address </a></li>
+            <li onclick="tabs(1)" class="user-review <%= (selection === 'order') ? 'active' : '' %>"><a href="/account/orders">Orders </a></li>
+        </ul>
+    </div>
+</div>
+
+    </div>
+</div>
