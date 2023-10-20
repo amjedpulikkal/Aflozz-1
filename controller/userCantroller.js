@@ -308,6 +308,8 @@ module.exports = {
     console.log("---------------------------------------------");
     res.status(200).json("ok")
   },
+
+  
   changePassword: async (req, res) => {
 
     const id = req.session.user._id
