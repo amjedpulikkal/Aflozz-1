@@ -234,7 +234,7 @@ module.exports = {
       const address = req.session.user.address
       console.log(address);
       const price = await userModel.getAmount(req.session.user._id)
-      res.render("user/address", { layout: "user/layout", titel: "Aflozz-cart", price, address ,cartLength:req.session.user.cart.length})
+      res.render("user/address", { layout: "user/layout", titel: "Aflozz-cart", price, address ,cartLength:req.session.user.cart.length,coupon:req.session?.coupon})
     } catch (err) {
       console.log(err);
     }
@@ -254,7 +254,7 @@ module.exports = {
     }
   },
   newOrder: async (req, res) => {
-
+    req.session.coupon = null
     const id = req.session.user._id
     const data = {}
     const index = Number(req.body.index)
@@ -335,7 +335,12 @@ module.exports = {
   },
   onlinePayment:async (req,res)=>{
     try {
-      console.log(Number(req.body.price*100));
+      console.log(req.body);
+      if(Number(req.body.discount)){
+        req.body.price -=req.body.discount
+      }
+      console.log(req.body);
+      
       const  instance = new Razorpay({
         key_id: process.env.key_id,
         key_secret:process.env.key_secret
@@ -356,6 +361,17 @@ module.exports = {
 
 
   },
+  couponCode:async(req,res)=>{
+    const code = req.params.code
+    const coupon = await userModel.claimCoupon(code,req.session.user._id)
+    console.log(coupon);
+    if (coupon.value){
+      req.session.coupon = coupon.value
+      res.json(coupon.value)
+    }else{
+      res.json(false)
+    }
+  }
  
   
 

@@ -1,14 +1,17 @@
 const { ObjectId } = require("mongodb");
-const { db_user, db_order, db_product, db_otp } = require("./db");
+const { db_user, db_order, db_product, db_otp, db_coupon } = require("./db");
 const { decryption, encryption } = require("./crypto");
 
 // Other required modules and dependencies
 
 module.exports = {
+    async claimCoupon(code,userId){
+        return await db_coupon.findOneAndUpdate({code,Limet:{$gt:0},user:{ $not: { $elemMatch: { $eq: new ObjectId(userId) } }},exDate:{$gte:new Date()}},{$inc:{Limet:-1},$push:{user:new ObjectId(userId)}})
+    },
     async updataUserPresence(id,presence) {
-
-        return await db_user.updateOne({_id: new ObjectId(id)},{$set:{presence}})
-
+        console.log(presence);
+        console.log(id)
+        return await db_user.updateOne({_id:new ObjectId(id)},{$set:{presence}})
     },
     async findaddress(id, index) {
         const user = await db_user.findOne({ _id: new ObjectId(id) })
@@ -279,7 +282,6 @@ module.exports = {
                     }
                 }
             ]);
-
             const data = await cursor.toArray();
             console.log(data)
             if (!quantity) {

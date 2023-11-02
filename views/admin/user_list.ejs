@@ -23,10 +23,10 @@
                                     <%= item.Email%>
                                 </td>
                                 <td>
-                                    <%if(item.presence){%>
-                                   <p class="text-green-600">Online</p>
+                                    <%if(item.presence === "online"){%>
+                                   <p class="text-green-600" id="Status<%=item._id%>">Online</p>
                                    <%}else{%>
-                                    <p><%=item.presence%></p>
+                                    <p id="Status<%=item._id%>"><%=item.presence%></p>
                                     <%}%>
                                 </td>
                                 <td>
@@ -53,3 +53,21 @@
         </div>
     </div>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.1/socket.io.js"></script>
+<script>
+    // Connect to the WebSocket server
+    const socket = io.connect('http://localhost:3000');
+
+    socket.on("UStatus", (data)=> {
+       
+           console.log(data);
+
+            document.getElementById(`Status${data.userId}`).innerHTML = data.Status
+            // const orderIN =document.getElementById(`order${data.orderID}`).querySelectorAll(".order-tracking") 
+            // console.log(orderIN.length)
+            // orderIN[data.status].classList.add("completed")
+
+        
+    })
+
+</script>

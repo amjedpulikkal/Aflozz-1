@@ -47,6 +47,9 @@ router.get("/account",ifuser,userController.getAccount)
 
 router.post("/online-payment-createid",ifuser,userController.onlinePayment)
 
+router.get("/promo/:code",ifuser,userController.couponCode)
+
+
 // const vapidKeys = {
 //     publicKey: 'BKLxNKnkxc-TdjswVmjljwTFPS20B58T7EWlNiDlAtu0dVee3SttxpugNeINTjpckj6fb1X6dlHCedYGYiWJ_6w',  // Replace with your actual public key
 //     privateKey: 'gmO-2wk-Ssk-M-D2c6ZGtdAFVCkCNJ0XC7UrfE1QT4E' // Replace with your actual private key

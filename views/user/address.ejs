@@ -237,7 +237,26 @@
                     </div>
 
                 </div>
+                <div class="py-10">
+                    <label for="promo" class="font-semibold inline-block mb-3 text-sm uppercase">Promo Code</label>
+                    <input type="text" id="promo" placeholder="Enter your code" class="p-2 text-sm w-full">
+                  </div>
+                  <button onclick="promo()" class="bg-red-500  hover:bg-red-600 px-5 py-2 text-sm text-white uppercase">Apply</button>
+                  <div>
                 <div class="border-t mt-8">
+                    <% if(!coupon){%>
+                    <div id="coupandiv" class="flex font-semibold hidden justify-between py-6 text-sm uppercase">
+                        <span>coupon discount</span>
+                        <span id="cValue">
+                        </span>
+                    </div>
+                    <%}esle{%>
+                        <div id="coupandiv" class="flex font-semibold  justify-between py-6 text-sm uppercase">
+                            <span>coupon discount</span>
+                            <span id="cValue"><%=coupon%>
+                            </span>
+                        </div>
+                        <%}%>
                     <div class="flex font-semibold justify-between py-6 text-sm uppercase">
                         <span>Total cost</span>
                         <span id="Ftotal">
@@ -333,6 +352,37 @@
     </script>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
+        let discount 
+        let Total = "<%=price%>"
+        function promo() {
+            
+          
+            const data =document.getElementById("promo").value
+    
+                fetch(`/promo/${data}`).then(data=>{
+                    data.json().then(data=>{
+                        // console.log(data)
+                        if (data) {
+                            console.log(data);
+                            document.getElementById("coupandiv").classList.remove("hidden")
+                            document.getElementById("cValue").innerHTML = "-"+data.value 
+                            discount = data.value
+                            document.getElementById("Ftotal").innerHTML= Total-=discount
+                        }else{
+
+                        }
+                    })
+                }).catch(err=>{
+                    console.log(err);
+                })
+    
+    
+                console.log(data);
+           
+        }
+        
+
+
         function sub() {
             const form = document.getElementById('form-1');
             const radioButtons = form.querySelectorAll('input[type=radio][name=address]');
@@ -359,7 +409,7 @@
                     })
             } else {
 
-                fetch("/online-payment-createid", { method: "POST", body: new URLSearchParams({ price: "<%=price%>" }) })
+                fetch("/online-payment-createid", { method: "POST", body: new URLSearchParams({ price: "<%=price%>",discount }) })
                     .then(res => {
 
                         console.log(res);
@@ -385,11 +435,11 @@
                                     })
 
                             },
-                            "prefill": {
-                                "name": "Gaurav Kumar",
-                                "email": "gaurav.kumar@example.com",
-                                "contact": "9000090000"
-                            },
+                            // "prefill": {
+                            //     "name": "Gaurav Kumar",
+                            //     "email": "gaurav.kumar@example.com",
+                            //     "contact": "9000090000"
+                            // },
                             "notes": {
                                 "address": "Razorpay Corporate Office"
                             },

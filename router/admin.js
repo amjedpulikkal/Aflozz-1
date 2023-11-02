@@ -13,10 +13,11 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage })
 
 router.get("/", ifadmin, adminController.getAdmin)
+router.post("/getReport", ifadmin, adminController.salseReport)
 router.route("/login", noadmin).get(adminController.getLogin).post(adminController.postLogin)
 
 // ----------------------product----------------------------------
-
+router.route("/coupon").get(ifadmin, adminController.coupon).post(ifadmin,adminController.postCoupon)
 router.get("/products", ifadmin, productCantroller.getProducts)
 router.route("/add/product")
     .get(ifadmin, productCantroller.getAddProdct)

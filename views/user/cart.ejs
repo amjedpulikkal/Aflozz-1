@@ -3,8 +3,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
-       <style>
-        #summary {
+   
+        input[type="number"] {
+            -moz-appearance: textfield;
+            /* Firefox */
+        }
+
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button{
+            -webkit-appearance: none;
+            appearance: none;
+        }
+    </style>
+    <style>
+        <style>#summary {
             background-color: #f6f6f6;
         }
 
@@ -56,8 +68,7 @@
             }
 
             .qty-count {
-                bor
-                padding: 0;
+                bor padding: 0;
                 cursor: pointer;
                 width: 2.5rem;
                 font-size: 1.25em;
@@ -165,12 +176,15 @@
                                     min="0" max="10" value="<%=products[i].quantity%>">
                                 <button class="qty-count qty-count--add" data-action="add" type="button">+</button>
                             </div> -->
-                            <div class="qty-input">
-                                <button class="qty-count qty-count--minus" data-action="subtract">-</button>
-                                <input class="product-qty" id="quantitySelect<%=i%>"
-                                    data-product-id="<%=products[i]._id %>" type="number" name="product-qty" min="0"
-                                    max="10" value="<%=products[i].quantity%>">
-                                <button class="qty-count qty-count--add" data-action="add">+</button>
+                            <div class="flex items-center border-gray-100 " style="width: 100px;">
+                                <span
+                                    class="cursor-pointer rounded-l bg-gray-200 py-1 px-3.5 duration-100 hover:bg-blue-500 hover:text-blue-50">
+                                    - </span>
+                                <input class="h-8 w-8 border bg-white text-black text-center text-xs outline-none"
+                                    type="number" value="2" min="1" readonly style="font-size: medium; " />
+                                <span
+                                    class="cursor-pointer rounded-r bg-gray-200 py-1 px-3 duration-100 hover:bg-blue-500 hover:text-blue-50">
+                                    + </span>
                             </div>
                         </div>
                         <span class="text-center w-1/5 font-semibold text-sm">
@@ -218,6 +232,7 @@
                     </div>
 
                 </div>
+
                 <div class="border-t mt-8">
                     <div class="flex font-semibold justify-between py-6 text-sm uppercase">
                         <span>Total cost</span>
@@ -311,7 +326,7 @@
 </script>
 <script>
     function remove(id) {
-       
+
         Swal.fire({
             title: 'Are you sure?',
             text: 'You won\'t be able to revert this!',
@@ -321,23 +336,23 @@
             cancelButtonText: 'No, cancel!'
         }).then((result) => {
             if (result.isConfirmed) {
-                
+
                 fetch(`cart/remove/${id}`).then(res => {
                     if (res.status === 200) {
                         //     document.getElementById(id).remove()
                         document.getElementById(id).remove()
                         console.log(res);
                         Total()
-        
+
                     }
                 })
-                
+
             } else if (result.dismiss === Swal.DismissReason.cancel) {
-                
+
             }
         });
 
-   
+
     }
 </script>
 <script>
@@ -393,7 +408,7 @@
         let TotalPrice = []
         const length = document.querySelectorAll(".itmes").length
         console.log(length);
-        for (let j = 0; j < length;j++) {
+        for (let j = 0; j < length; j++) {
             const price = document.getElementById(`price${j}`)
             TotalPrice.push(Number(price.textContent))
         }

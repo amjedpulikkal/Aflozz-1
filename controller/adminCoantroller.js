@@ -5,6 +5,20 @@ const userModel = require("../model/userModel");
 // const {userSockets} = require("./userCantroller")
 
 module.exports = {
+    postCoupon: async (req, res) => {
+        console.log(req.body);
+        console.log(req.body.exDate);
+        console.log(new Date(req.body.exDate));
+        req.body.exDate = new Date(req.body.exDate)
+        req.body.Limet = Number(req.body.Limet)
+        await db.newCoupon(req.body)
+        res.redirect("/admin/coupon")
+    },
+    coupon: async (req, res) => {
+        const coupon = await db.getCoupons()
+        res.render("admin/coupon", { layout: "admin/layout" ,coupon})
+
+    },
     updateOrder: async (req, res) => {
         const id = req.params.id
         const data = req.body
@@ -17,8 +31,7 @@ module.exports = {
         const userId = data2.value.user_id.toString()
         console.log("--------------------------");
         const userIO = io.userSockets.get(userId)
-        console.log(!userIO);
-        userIO.emit("status", {orderID: data2.value._id, status: data2.value.status.length})
+        userIO?.emit("status", { orderID: data2.value._id, status: data2.value.status.length })
         console.log("--------------------------");
 
 
@@ -45,8 +58,14 @@ module.exports = {
         console.log(orders[0].status[0]?.date);
         res.render("admin/order", { layout: 'admin/layout', orders })
     },
+    salseReport: async (req, res) => {
+        const data = await db.salseReport()
+        const total = await db.totalSales()
+        console.log(total[0]?.toatalSales.toFixed(1) || 0);
+        res.json({ data, total: total[0]?.toatalSales.toFixed(1) || 0 })
+    },
     getAdmin: (req, res) => {
-        res.redirect("/admin/products")
+        res.render("admin/admin", { layout: 'admin/layout' })
     },
     getLogin: (req, res) => {
         res.render("admin/login", { layout: 'login/layout-log' })

@@ -114,6 +114,9 @@
             const orderIN =document.getElementById(`order${data.orderID}`).querySelectorAll(".order-tracking") 
             console.log(orderIN.length)
             orderIN[data.status].classList.add("completed")
+             if(data.status===2){
+                document.getElementById(data.orderID).remove()
+             }
 
         
     })
@@ -121,6 +124,7 @@
 </script>
 
     <script>
+
         function cancel(id) {
             Swal.fire({
                 title: 'Cancel Order',
