@@ -11,6 +11,7 @@
                         <tr>
                             <th>Name</th>
                             <th>Email</th>
+                            <th>Status</th>
                             <th>Setting</th>
                         </tr>
                         <% user.forEach(function(item) { %>
@@ -22,14 +23,18 @@
                                     <%= item.Email%>
                                 </td>
                                 <td>
+                                    <%if(item.presence){%>
+                                   <p class="text-green-600">Online</p>
+                                   <%}else{%>
+                                    <p><%=item.presence%></p>
+                                    <%}%>
+                                </td>
+                                <td>
                                     <% if(item.status===false){ %>
                                         <a href="/admin/block?_id=<%=item._id%>&status=true" class="ds-setting">Disabled</a>
                                     <%}else{%>
                                             <a href="/admin/block?_id=<%=item._id%>&status=false" class="pd-setting">Active</a>
                                         <%}%>
-                                </td>
-                                <td>
-                                   
                                 </td>
                             </tr>
                             <% }); %>

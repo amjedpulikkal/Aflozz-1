@@ -2,37 +2,50 @@
 
 const db = require("../model/adminModel");
 const userModel = require("../model/userModel");
+// const {userSockets} = require("./userCantroller")
 
-
-module.exports={
-    updateOrder:async(req,res)=>{
+module.exports = {
+    updateOrder: async (req, res) => {
         const id = req.params.id
         const data = req.body
         console.log(data);
-        data.date= new Date()
-       await userModel.updateOrderStatus(id,data)
-       res.redirect("/admin/orders")
+        data.date = new Date()
+        const data2 = await userModel.updateOrderStatus(id, data)
+        console.log(data2);
+        res.redirect("/admin/orders")
+        const io = require("../model/socket")
+        const userId = data2.value.user_id.toString()
+        console.log("--------------------------");
+        const userIO = io.userSockets.get(userId)
+        console.log(!userIO);
+        userIO.emit("status", {orderID: data2.value._id, status: data2.value.status.length})
+        console.log("--------------------------");
+
+
+        //    const userId = data2.userId
+        //    const socket = userSockets.get(userId)
+        //    console.log(socket);
     },
-    orderD:async(req,res)=>{
+    orderD: async (req, res) => {
         const id = req.params.id
         const data = await userModel.orderDetails(id)
         const products = await userModel.orderProduct(id)
         console.log(data);
-        data.status =data.status
-         res.render("admin/orderDitel", { layout:'admin/layout',products,data})
+        data.status = data.status
+        res.render("admin/orderDitel", { layout: 'admin/layout', products, data })
 
-        
+
     },
-    
-    getOrder:async(req,res)=>{
+
+    getOrder: async (req, res) => {
         const orders = await db.getOrders()
         const options = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' };
-        orders.forEach(i=>{ i.date = new Date(i.date).toLocaleDateString('en-US', options)}) ;
-        orders.forEach(i=>{ i.status.forEach(i=>{ i.date = new Date(i.date).toLocaleDateString('en-US', options)})}) ;
+        orders.forEach(i => { i.date = new Date(i.date).toLocaleDateString('en-US', options) });
+        orders.forEach(i => { i.status.forEach(i => { i.date = new Date(i.date).toLocaleDateString('en-US', options) }) });
         console.log(orders[0].status[0]?.date);
-        res.render("admin/order", { layout: 'admin/layout',orders})
+        res.render("admin/order", { layout: 'admin/layout', orders })
     },
-    getAdmin:(req, res) => {
+    getAdmin: (req, res) => {
         res.redirect("/admin/products")
     },
     getLogin: (req, res) => {
@@ -42,7 +55,7 @@ module.exports={
     postLogin: (req, res) => {
         try {
             let admin = req.body
-    
+
             db.admin_find(admin).then(data => {
                 console.log(data);
                 req.session.admin = data
@@ -51,10 +64,10 @@ module.exports={
                 console.log(err.err);
                 res.status(err.status).json(err.err)
             })
-    
-        } catch (error) {   
+
+        } catch (error) {
             console.log(error);
-    
+
         }
-    }, 
+    },
 }

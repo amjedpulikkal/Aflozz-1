@@ -2,18 +2,19 @@
 const jwt = require("../model/JWT")
 const userModel = require("../model/userModel")
 const productModel = require("../model/productModel")
-const { sendmailForPassword } = require("../Model/nodemailer")
-
+const { sendmailForPassword } = require("../model/nodemailer")
+const Razorpay = require("razorpay")
+require("dotenv").config()
 module.exports = {
   getHome: async (req, res) => {
     const products = await productModel.ufind_product()
-    console.log(products);
-    res.render("user/home", { layout: "user/layout", products, titel: "Aflozz" })
+    console.log(products)
+    res.render("user/home", { layout: "user/layout", products, titel: "Aflozz" ,cartLength:req.session.user.cart.length})
 
   },
   getlogin: (req, res) => {
 
-    res.render("login/sign-login", { layout: "login/layout-log" })
+    res.render("login/sign-login", { layout: "login/layout-log"})
 
   },
   psotLgin: async (req, res) => {
@@ -38,7 +39,7 @@ module.exports = {
       const id = req.params.id
       const product = await productModel.findOne_product(id)
       console.log(product);
-      res.render("user/products", { layout: "user/layout", product, titel: "Aflozz" })
+      res.render("user/products", { layout: "user/layout", product, titel: "Aflozz" ,cartLength:req.session.user.cart.length})
     } catch (error) {
       console.log(error);
     }
@@ -81,7 +82,6 @@ module.exports = {
   },
   postOtp: async (req, res, next) => {
     try {
-
       const data = req.body
       console.log(data)
 
@@ -156,7 +156,7 @@ module.exports = {
   },
   getAll: async (req, res) => {
     try {
-      const user = await categoryModel.all_user()
+      const user = await userModel.all_user()
       res.render("admin/user_list", { layout: 'admin/layout', user })
     } catch (error) {
       console.log(error);
@@ -176,10 +176,10 @@ module.exports = {
       const products = await userModel.findCart(req.session.user._id)
       if (products) {
         const data = await userModel.getAmount(req.session.user._id)
-        res.render("user/cart", { layout: "user/layout", titel: "Aflozz-cart", products, price: data })
+        res.render("user/cart", { layout: "user/layout", titel: "Aflozz-cart", products, price: data,cartLength:req.session.user.cart.length })
       } else {
 
-        res.render("user/cart", { layout: "user/layout", titel: "Aflozz-cart", products: [], price: 0 })
+        res.render("user/cart", { layout: "user/layout", titel: "Aflozz-cart", products: [], price: 0 ,cartLength:req.session.user.cart.length})
       }
     } catch (err) {
       console.log(err);
@@ -193,7 +193,7 @@ module.exports = {
       console.log(user_id)
       console.log(id)
       await userModel.addTocart(user_id, id)
-      res.status(200).json("goot")
+      res.status(200).json({cartLength:req.session.user.cart.length+1})
     } catch (err) {
       console.log(err);
     }
@@ -202,10 +202,10 @@ module.exports = {
     try {
       console.log(req.params)
       const data = await userModel.cartRemove(req.session.user._id, req.params.id)
-
+     
       console.log(data);
       // res.redirect("/cart")
-      res.status(200).json("delete")
+      res.status(200).json({cartLength:req.session.user.cart.lengtgh-data.modifiedCount})
 
     } catch (err) {
       console.log(err);
@@ -234,7 +234,7 @@ module.exports = {
       const address = req.session.user.address
       console.log(address);
       const price = await userModel.getAmount(req.session.user._id)
-      res.render("user/address", { layout: "user/layout", titel: "Aflozz-cart", price, address })
+      res.render("user/address", { layout: "user/layout", titel: "Aflozz-cart", price, address ,cartLength:req.session.user.cart.length})
     } catch (err) {
       console.log(err);
     }
@@ -248,7 +248,7 @@ module.exports = {
       orders.forEach(i => { i.date = new Date(i.date).toLocaleDateString('en-US', options) });
       orders.forEach(i => { i.status.forEach(i => { i.date = new Date(i.date).toLocaleDateString('en-US', options) }) });
       console.log(orders[0].status[0]);
-      res.render("user/account/order", { layout: "user/layout", titel: "Aflozz-cart", selection: "order", orders, user: req.session.user })
+      res.render("user/account/order", { layout: "user/layout", titel: "Aflozz-cart", selection: "order", orders, user: req.session.user ,cartLength:req.session.user.cart.length})
     } catch (err) {
       console.log(err);
     }
@@ -271,7 +271,7 @@ module.exports = {
   },
   getAccount: async (req, res) => {
     const address = req.session.user.address
-    res.render("user/account/address", { layout: "user/layout", titel: "Aflozz-Account", selection: "address", address, user: req.session.user })
+    res.render("user/account/address", { layout: "user/layout", titel: "Aflozz-Account", selection: "address", address, user: req.session.user,cartLength:req.session.user.cart.length })
   },
   newAdress: async (req, res) => {
     const user_id = req.session.user._id
@@ -289,7 +289,7 @@ module.exports = {
     orders.status.forEach(i => { i.date = new Date(i.date).toLocaleDateString('en-US', options) })
     console.log(orders);
     console.log(products);
-    res.render("user/account/order-items", { layout: "user/layout", titel: "Aflozz-Account", selection: "order", data: orders, products, user: req.session.user })
+    res.render("user/account/order-items", { layout: "user/layout", titel: "Aflozz-Account", selection: "order", data: orders, products, user: req.session.user,cartLength:req.session.user.cart.length})
 
   },
   addressRemove: async (req, res) => {
@@ -298,7 +298,7 @@ module.exports = {
     res.redirect("/account")
   },
   profil: async (req, res) => {
-    res.render("user/account/profile", { layout: "user/layout", titel: "Aflozz-Account", selection: "profil", user: req.session.user })
+    res.render("user/account/profile", { layout: "user/layout", titel: "Aflozz-Account", selection: "profil", user: req.session.user,cartLength:req.session.user.cart.length })
   },
   cancelOrder: async (req, res) => {
     const id = req.params.id
@@ -324,15 +324,40 @@ module.exports = {
     })
   },
   newAddress: async (req, res) => {
-    res.render("user/newAddress", { layout: "user/layout", titel: "Aflozz-Account", data: null })
+    res.render("user/newAddress", { layout: "user/layout", titel: "Aflozz-Account", data: null,cartLength:req.session.user.cart.length})
   },
   editAddress: async (req, res) => {
     const index = req.params.id
     const data = await userModel.findaddress(req.session.user._id, index)
     console.log(data);
-    res.render("user/newAddress", { layout: "user/layout", titel: "Aflozz-Account", data })
+    res.render("user/newAddress", { layout: "user/layout", titel: "Aflozz-Account", data,cartLength:req.session.user.cart.length})
 
-  }
+  },
+  onlinePayment:async (req,res)=>{
+    try {
+      console.log(Number(req.body.price*100));
+      const  instance = new Razorpay({
+        key_id: process.env.key_id,
+        key_secret:process.env.key_secret
+      })
+      const options = {
+        amount: Number(req.body.price)*100,
+        currency: "INR",
+        receipt: "order_rcptid_11"
+      };
+      console.log(req.body.price);
+      const id = await instance.orders.create(options)
+      console.log(id);
+      res.status(200).json({orderId:id})
+    } catch (error) {
+      console.log(error);
+      
+    }
+
+
+  },
+ 
+  
 
 
 

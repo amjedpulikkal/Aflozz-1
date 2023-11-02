@@ -38,11 +38,14 @@ module.exports ={
             const { image, id } = req.query
             const images = image.split(',')
             console.log(images)
-            images.forEach(image => {
-                fs.unlinkSync(path.join(__dirname, "../public/image/products/", image), (info, err) => {
-                    console.log(err);
+            if(image){
+
+                images.forEach(image => {
+                    fs.unlinkSync(path.join(__dirname, "../public/image/products/", image), (info, err) => {
+                        console.log(err);
+                    })
                 })
-            })
+            }
             const products = await productModel.delete_product(id)
             console.log(products);
             if (products.deletedCount > 0) {

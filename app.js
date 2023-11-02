@@ -6,6 +6,8 @@ const ejslayout = require("express-ejs-layouts")
 const nocache = require("nocache")
 const cookieParser = require("cookie-parser")
 const session = require("express-session")
+const socket = require("socket.io")
+const http =require("http")
 const app = express()
 
 
@@ -28,6 +30,9 @@ app.use("/",userRouter)
 app.all("/*",(req,res)=>res.render("404",{layout:"login/layout"}))
 
 
-app.listen(process.env.PORT,()=>{
-    console.log(`start ${process.env.PORT}`);
+const server = http.createServer((app))
+const io = require("./model/socket.js").Server(server)
+
+server.listen(process.env.PORT,()=>{
+  console.log(`start ${process.env.PORT}`);
 })

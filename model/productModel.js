@@ -1,11 +1,14 @@
 const { db_product } = require("./db")
 const { ObjectId } = require("mongodb");
 
-
 module.exports = {
-    async ufind_product(data) {
+    async ufind_product() {
         try {
-            return await db_product.find({ $and: [{ stock: { $ne: "0" } }, { status: true }] }).toArray()
+            return await db_product.aggregate([
+                { $match: { stock: { $ne: "0" }, status: true } },
+                { $sample: { size: 4 } }
+              ]).toArray();
+              
         } catch (errr) {
             console.log(errr);
             throw errr

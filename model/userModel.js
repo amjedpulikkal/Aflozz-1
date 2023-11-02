@@ -1,11 +1,13 @@
 const { ObjectId } = require("mongodb");
-const { db_user, db_order, db_product } = require("./db");
+const { db_user, db_order, db_product, db_otp } = require("./db");
 const { decryption, encryption } = require("./crypto");
 
 // Other required modules and dependencies
 
 module.exports = {
-    async degress(product) {
+    async updataUserPresence(id,presence) {
+
+        return await db_user.updateOne({_id: new ObjectId(id)},{$set:{presence}})
 
     },
     async findaddress(id, index) {
@@ -47,7 +49,7 @@ module.exports = {
     },
     async updateOrderStatus(id, data) {
 
-        return await db_order.updateOne({ _id: new ObjectId(id) }, { $push: { status: data } })
+        return await db_order.findOneAndUpdate({ _id: new ObjectId(id) }, { $push: { status: data } })
     },
     async orderDetails(id) {
         return await db_order.findOne({ _id: new ObjectId(id) })
@@ -89,7 +91,7 @@ module.exports = {
                     }
                 }
             }]).toArray()
-        console.log(order[0].products);
+        // console.log(order[0].products);
 
         return order[0].products
 
@@ -345,6 +347,9 @@ module.exports = {
         data.Password = encryption(data.Password);
         console.log(data.Password);
         data.status = true;
+        data.cart = []
+        data.address = []
+        data.presence = true
         return await db_user.insertOne(data);
     },
 
@@ -401,5 +406,27 @@ module.exports = {
 
     async all_user() {
         return await db_user.find().toArray();
+    },
+    async findOtp(params) {
+
+        const data = await db_otp.findOne({ otp: params })
+        await db_otp.deleteOne({ otp: params })
+        return data
+
+    },
+    async storeOtp(data) {
+
+        const nodemailer = require("./nodemailer")
+        const digits = '0123456789';
+        let OTP = '';
+        for (let i = 0; i < 4; i++) {
+            OTP += digits[Math.floor(Math.random() * 10)];
+        }
+        data.otp = OTP
+        console.log(data.otp);
+        console.log(data.Email);
+        await nodemailer.sendmail(data.user.Email, data.otp, data.Name)
+        return await db_otp.insertOne(data)
+
     },
 };

@@ -19,7 +19,7 @@
                 </div>
             </li>
             <% orders.forEach(function(items) { %>
-                <li>
+                <li id="order<%=items._id%>">
                     <div class="px-4 py-5 sm:px-6 border">
                         <div class="flex items-center justify-between">
                             <div class="flex">
@@ -61,28 +61,27 @@
                                                         </span></p>
                                                 </div>
                                                 <%}else{%>
-                                                    <div
-                                                    class="order-tracking cancel">
-                                                    <span class="is-complete"></span>
-                                                    <p>Ordered<br><span>
-                                                            <%= (items.status[0]?.date) ? items.status[0]?.date : '' %>
-                                                        </span></p>
-                                                </div>
-                                                <div
-                                                    class="order-tracking cancel">
-                                                    <span class="z-10">Canceld</span>
-                                                   
-                                                </div>
-                                                <div
-                                                    class="order-tracking  cancel">
-                                                    <span class="is-complete"></span>
-                                                    <p>Delivered<br><span>
-                                                            <%= (items.status[2]?.date) ? items.status[2]?.date : '' %>
-                                                        </span></p>
-                                                </div>
-                                                    
-                                                    
-                                                    
+                                                    <div class="order-tracking cancel">
+                                                        <span class="is-complete"></span>
+                                                        <p>Ordered<br><span>
+                                                                <%= (items.status[0]?.date) ? items.status[0]?.date : ''
+                                                                    %>
+                                                            </span></p>
+                                                    </div>
+                                                    <div class="order-tracking cancel">
+                                                        <span class="z-10">Canceld</span>
+
+                                                    </div>
+                                                    <div class="order-tracking  cancel">
+                                                        <span class="is-complete"></span>
+                                                        <p>Delivered<br><span>
+                                                                <%= (items.status[2]?.date) ? items.status[2]?.date : ''
+                                                                    %>
+                                                            </span></p>
+                                                    </div>
+
+
+
                                                     <%}%>
                                         </div>
                                     </div>
@@ -103,10 +102,36 @@
 
         </ul>
     </div>
+<!-- Include the WebSocket client library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.1/socket.io.js"></script>
+<script>
+    // Connect to the WebSocket server
+    const socket = io.connect('http://localhost:3000');
+    socket.emit("userId","<%=user._id%>")
+    socket.on("status", (data)=> {
+       
+           console.log(data);
+            const orderIN =document.getElementById(`order${data.orderID}`).querySelectorAll(".order-tracking") 
+            console.log(orderIN.length)
+            orderIN[data.status].classList.add("completed")
+
+        
+    })
+
+</script>
 
     <script>
         function cancel(id) {
-
+            Swal.fire({
+                title: 'Cancel Order',
+                text: 'Are you sure you want to cancel this order?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, cancel it!',
+                cancelButtonText: 'No, keep it'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    
             fetch('/order/cancel/' + id)
                 .then(res => {
                     if (!res.ok) {
@@ -122,6 +147,12 @@
                 .catch(error => {
                     console.error('Fetch error:', error);
                 });
+                  
+                } else {
+                    res.send('Order was not canceled.');
+                }
+            });
+
 
         }
     </script>

@@ -127,7 +127,7 @@
                 </div>
 
                 <% for (let i=0; i< products.length; i++) { %>
-                    <div class="flex items-center hover:bg-gray-100 -mx-8 px-6 py-5" id="<%=products[i]._id %>">
+                    <div class="flex items-center hover:bg-gray-100 -mx-8 px-6 py-5 itmes" id="<%=products[i]._id %>">
                         <div class="flex w-2/5"> <!-- product -->
                             <div class="w-20">
                                 <img class="h-24" src="/image/products/<%=products[i].image[0]%>" alt="">
@@ -311,14 +311,33 @@
 </script>
 <script>
     function remove(id) {
-        fetch(`cart/remove/${id}`).then(res => {
-            if (res.status === 200) {
-                //     document.getElementById(id).remove()
-                // Total()
-                window.location.reload()
-
+       
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You won\'t be able to revert this!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, cancel!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                
+                fetch(`cart/remove/${id}`).then(res => {
+                    if (res.status === 200) {
+                        //     document.getElementById(id).remove()
+                        document.getElementById(id).remove()
+                        console.log(res);
+                        Total()
+        
+                    }
+                })
+                
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                
             }
-        })
+        });
+
+   
     }
 </script>
 <script>
@@ -372,7 +391,9 @@
     function Total() {
 
         let TotalPrice = []
-        for (let j = 0; j < "<%=products.length %>"; j++) {
+        const length = document.querySelectorAll(".itmes").length
+        console.log(length);
+        for (let j = 0; j < length;j++) {
             const price = document.getElementById(`price${j}`)
             TotalPrice.push(Number(price.textContent))
         }
