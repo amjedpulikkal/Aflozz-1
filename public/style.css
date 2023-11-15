@@ -64,6 +64,7 @@
 	border-color: #ff0202;
 	border-width: 0px;
 	background-color:#ff0202;
+  
 }
 .order-tracking.cancel .is-complete:after {
   border-color: #ff0202;
