@@ -240,229 +240,259 @@
                 <div class="py-10">
                     <label for="promo" class="font-semibold inline-block mb-3 text-sm uppercase">Promo Code</label>
                     <input type="text" id="promo" placeholder="Enter your code" class="p-2 text-sm w-full">
-                  </div>
-                  <button onclick="promo()" class="bg-red-500  hover:bg-red-600 px-5 py-2 text-sm text-white uppercase">Apply</button>
-                  <div>
-                <div class="border-t mt-8">
-                    <% if(!coupon){%>
-                    <div id="coupandiv" class="flex font-semibold hidden justify-between py-6 text-sm uppercase">
-                        <span>coupon discount</span>
-                        <span id="cValue">
-                        </span>
-                    </div>
-                    <%}esle{%>
-                        <div id="coupandiv" class="flex font-semibold  justify-between py-6 text-sm uppercase">
-                            <span>coupon discount</span>
-                            <span id="cValue"><%=coupon%>
-                            </span>
-                        </div>
-                        <%}%>
-                    <div class="flex font-semibold justify-between py-6 text-sm uppercase">
-                        <span>Total cost</span>
-                        <span id="Ftotal">
-                            <%=price%>
-                        </span>
-                    </div>
-                    <div class="mt-4 pb-4">
-                        <input id="default-radio-1" type="radio" value="cashOnDelivery" name="payment"
-                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                        <label for="default-radio-1" class="ml-2 text-sm font-medium ">cash on Delivery</label>
-                    </div>
-                    <div class="mt-4 pb-4">
-                        <input checked id="default-radio-2" type="radio" value="razorpay" name="payment"
-                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                        <label for="default-radio-2" class="ml-2 text-sm font-medium ">Razorpay</label>
-                    </div>
-                    <button onclick="sub() " id="chBut"
-                        class="bg-indigo-500 font-semibold hover:bg-indigo-600 py-3 text-sm text-white uppercase w-full">Checkout</button>
+                    <p class="text-red-600" id="E_promo"></p>
+                </div>
+                <button onclick="promo()"
+                    class="bg-red-500  hover:bg-red-600 px-5 py-2 text-sm text-white uppercase">Apply</button>
+                <div>
+                    <div class="border-t mt-8">
+                        <% if(!coupon){%>
+                            <div id="coupandiv"
+                                class="flex font-semibold hidden justify-between py-6 text-sm uppercase">
+                                <span>coupon discount</span>
+                                <span id="cValue">
+                                </span>
+                            </div>
+                            <%}else{%>
+                                <div id="coupandiv" class="flex font-semibold  justify-between py-6 text-sm uppercase">
+                                    <span>coupon discount</span>
+                                    <span id="cValue">
+                                    </span>
+                                </div>
+                                <%}%>
+                                    <div class="flex font-semibold justify-between py-6 text-sm uppercase">
+                                        <span>Total cost</span>
+                                        <span id="Ftotal">
+                                            <%=price%>
+                                        </span>
+                                    </div>
+                                    <div class="mt-4 pb-4">
+                                        <input id="default-radio-1" type="radio" value="cashOnDelivery" name="payment"
+                                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                        <label for="default-radio-1" class="ml-2 text-sm font-medium ">cash on
+                                            Delivery</label>
+                                    </div>
+                                    <div class="mt-4 pb-4">
+                                        <input checked id="default-radio-2" type="radio" value="razorpay" name="payment"
+                                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                        <label for="default-radio-2" class="ml-2 text-sm font-medium ">Razorpay</label>
+                                    </div>
+                                    <button onclick="sub() " id="chBut"
+                                        class="bg-indigo-500 font-semibold hover:bg-indigo-600 py-3 text-sm text-white uppercase w-full">Checkout</button>
 
-                    <div
-                        class="bg-indigo-500 hidden flex justify-center  font-semibold hover:bg-indigo-600 py-3 text-sm text-white uppercase " style="height: 44px; width: 256px;" id="spinnerCh">
+                                    <div class="bg-indigo-500 hidden flex justify-center  font-semibold hover:bg-indigo-600 py-3 text-sm text-white uppercase "
+                                        style="height: 44px; width: 256px;" id="spinnerCh">
 
-                        <div class="dot-pulse">
-                            <div class="dot-pulse__dot"></div>
-                        </div>
+                                        <div class="dot-pulse">
+                                            <div class="dot-pulse__dot"></div>
+                                        </div>
 
+                                    </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <script>
+        <script>
 
-        document.getElementById("F-MRP").innerHTML = JSON.parse(localStorage.getItem('totalMRP'));
+            document.getElementById("F-MRP").innerHTML = JSON.parse(localStorage.getItem('totalMRP'));
 
-        const fetchLocation = document.getElementById("fetchLocation")
-        const spinner = document.getElementById("spinner")
-        const but = document.getElementById("fetchLocation")
-        but.addEventListener("click", e => {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(position => {
-                    fetchLocation.classList.add("hidden")
-                    spinner.classList.remove("hidden")
-                    console.log(position.coords.latitude);
-                    console.log(position.coords.longitude);
-                    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.coords.latitude}&lon=${position.coords.longitude}`)
-                        .then(data => {
-                            return data.json()
-                        })
-                        .then(data => {
-                            console.log(data);
-                            document.getElementById("Address").value = data.display_name
-                            document.getElementById("postal-code").value = data.address.postcode
-                            document.getElementById("city").value = data.address.county
-                            document.getElementById("region").value = data.address.village || ""
-                            fetchLocation.classList.remove("hidden")
-                            spinner.classList.add("hidden")
+            const fetchLocation = document.getElementById("fetchLocation")
+            const spinner = document.getElementById("spinner")
+            const but = document.getElementById("fetchLocation")
+            but.addEventListener("click", e => {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(position => {
+                        fetchLocation.classList.add("hidden")
+                        spinner.classList.remove("hidden")
+                        console.log(position.coords.latitude);
+                        console.log(position.coords.longitude);
+                        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.coords.latitude}&lon=${position.coords.longitude}`)
+                            .then(data => {
+                                return data.json()
+                            })
+                            .then(data => {
+                                console.log(data);
+                                document.getElementById("Address").value = data.display_name
+                                document.getElementById("postal-code").value = data.address.postcode
+                                document.getElementById("city").value = data.address.county
+                                document.getElementById("region").value = data.address.village || ""
+                                fetchLocation.classList.remove("hidden")
+                                spinner.classList.add("hidden")
 
-                        })
-                });
-            } else {
-                x.innerHTML = "Geolocation is not supported by this browser.";
-            }
-        })
-    </script>
-
-    <script>
-        const newaddress = document.getElementById("address-form")
-        newaddress.addEventListener("submit", e => {
-            e.preventDefault()
-
-            const data = {}
-            data.name = `${newaddress.elements.fname.value}${newaddress.elements.lname.value}`;
-            data.Number = newaddress.elements.Number.value;
-            data.address = newaddress.elements.address.value;
-            data.city = newaddress.elements.city.value;
-            data.village = newaddress.elements.village.value;
-            data.pincode = newaddress.elements.pincode.value;
-            data.address = `${data.address},${data.city},${data.village}-${data.pincode}`
-            console.log(data);
-            fetch("/address", { method: "POST", body: new URLSearchParams(data) }).then(res => {
-                if (res.status === 200) {
-
-                    window.location.replace('/cart/address');
-
-
+                            })
+                    });
+                } else {
+                    x.innerHTML = "Geolocation is not supported by this browser.";
                 }
             })
+        </script>
+
+        <script>
+            const newaddress = document.getElementById("address-form")
+            newaddress.addEventListener("submit", e => {
+                e.preventDefault()
+
+                const data = {}
+                data.name = `${newaddress.elements.fname.value}${newaddress.elements.lname.value}`;
+                data.Number = newaddress.elements.Number.value;
+                data.address = newaddress.elements.address.value;
+                data.city = newaddress.elements.city.value;
+                data.village = newaddress.elements.village.value;
+                data.pincode = newaddress.elements.pincode.value;
+                data.address = `${data.address},${data.city},${data.village}-${data.pincode}`
+                console.log(data);
+                fetch("/address", { method: "POST", body: new URLSearchParams(data) }).then(res => {
+                    if (res.status === 200) {
+
+                        window.location.replace('/cart/address');
 
 
-        })
-    </script>
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    <script>
-        let discount 
-        let Total = "<%=price%>"
-        function promo() {
-            
-          
-            const data =document.getElementById("promo").value
-    
-                fetch(`/promo/${data}`).then(data=>{
-                    data.json().then(data=>{
+                    }
+                })
+
+
+            })
+        </script>
+        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+        <script>
+            let discount = Number("<%=coupon?.value%>")
+            let discountID = "<%=coupon?.id%>" || 0
+            let Total = "<%=price%>"
+            if (discount) {
+                console.log(discount + 500);
+                console.log(Total >= discount + 500);
+                if (Total >= discount + 500) {
+                    discountID = data._id
+                    document.getElementById("Ftotal").innerHTML = Total -= discount
+                    document.getElementById("cValue").innerHTML = "-" + discount
+
+                } else {
+                    discountID = null
+                    document.getElementById("promo").value = "<%=coupon?.code%>"
+                    document.getElementById("E_promo").innerHTML = `You must purchase above ${discount+500}`
+                }
+            }
+            // discount ? document.getElementById("Ftotal").innerHTML = Total -= discount : console.log(false)
+            function promo() {
+
+
+                const data = document.getElementById("promo").value
+
+                fetch(`/promo/${data}`).then(data => {
+                    data.json().then(data => {
                         // console.log(data)
                         if (data) {
                             console.log(data);
                             document.getElementById("coupandiv").classList.remove("hidden")
-                            document.getElementById("cValue").innerHTML = "-"+data.value 
-                            discount = data.value
-                            document.getElementById("Ftotal").innerHTML= Total-=discount
-                        }else{
+                            // document.getElementById("cValue").innerHTML = "-" + data.value
+                            discount = Number(data.value)
+                            if (Total >= discount + 500) {
+                                discountID = data._id
+                                document.getElementById("Ftotal").innerHTML = Total -= discount
+                                document.getElementById("E_promo").innerHTML = ""
+                                document.getElementById("cValue").innerHTML = "-" + discount
+                            } else {
+                                document.getElementById("E_promo").innerHTML = `You must purchase above ${discount + 500}`
+                            }
+                        } else {
+                            document.getElementById("E_promo").innerHTML = `Invalid coupon code`
 
                         }
                     })
-                }).catch(err=>{
+                }).catch(err => {
                     console.log(err);
                 })
-    
-    
+
+
                 console.log(data);
-           
-        }
-        
 
-
-        function sub() {
-            const form = document.getElementById('form-1');
-            const radioButtons = form.querySelectorAll('input[type=radio][name=address]');
-            const payradioButtons = document.querySelectorAll('input[type=radio][name=payment]');
-            document.getElementById("chBut").classList.add("hidden")
-            document.getElementById("spinnerCh").classList.remove("hidden")
+            }
 
 
 
-            for (let i = 0; i < radioButtons.length; i++) {
-                if (radioButtons[i].checked) {
-                    selectedValue = radioButtons[i].value;
-                    break;
+            function sub() {
+                const form = document.getElementById('form-1');
+                const radioButtons = form.querySelectorAll('input[type=radio][name=address]');
+                const payradioButtons = document.querySelectorAll('input[type=radio][name=payment]');
+                document.getElementById("chBut").classList.add("hidden")
+                document.getElementById("spinnerCh").classList.remove("hidden")
+
+
+
+                for (let i = 0; i < radioButtons.length; i++) {
+                    if (radioButtons[i].checked) {
+                        selectedValue = radioButtons[i].value;
+                        break;
+                    }
                 }
-            }
-            console.log(payradioButtons);
-            console.log(payradioButtons.length);
-            if (payradioButtons[0].checked) {
-                fetch("/new-order", { method: "POST", body: new URLSearchParams({ index: selectedValue, paymentType: "Cash on Delivery", totalMRP: JSON.parse(localStorage.getItem('totalMRP')) }) })
-                    .then(res => {
-                        if (res.status === 200) {
-                            window.location.replace("/account/orders")
-                        }
-                    })
-            } else {
+                console.log(payradioButtons);
+                console.log(payradioButtons.length);
+                if (payradioButtons[0].checked) {
 
-                fetch("/online-payment-createid", { method: "POST", body: new URLSearchParams({ price: "<%=price%>",discount }) })
-                    .then(res => {
-
-                        console.log(res);
-                        return res.json()
-                    }).then(data => {
-                        console.log(data);
-                        console.log(data.orderId.id);
-                        var options = {
-                            "key": "rzp_test_ISFWvbAXmN0zBI", // Enter the Key ID generated from the Dashboard
-                            "currency": "INR",
-                            "name": "Acme Corp",
-                            "description": "Test Transaction",
-                            "image": "https://example.com/your_logo",
-                            "order_id": data.orderId.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-                            "handler": function (response) {
-
-                                document.getElementById("spinnerCh").classList.add("bg-green-600")
-                                fetch("/new-order", { method: "POST", body: new URLSearchParams({ index: selectedValue, paymentType: "online", totalMRP: JSON.parse(localStorage.getItem('totalMRP')) }) })
-                                    .then(res => {
-                                        if (res.status === 200) {
-                                            window.location.replace("/account/orders")
-                                        }
-                                    })
-
-                            },
-                            // "prefill": {
-                            //     "name": "Gaurav Kumar",
-                            //     "email": "gaurav.kumar@example.com",
-                            //     "contact": "9000090000"
-                            // },
-                            "notes": {
-                                "address": "Razorpay Corporate Office"
-                            },
-                            "theme": {
-                                "color": "#3399cc"
+                    console.log(Total - discount);
+                    fetch("/new-order", { method: "POST", body: new URLSearchParams({ index: selectedValue, paymentType: "Cash on Delivery", totalMRP: Total - discount }) })
+                        .then(res => {
+                            if (res.status === 200) {
+                                window.location.replace("/account/orders")
                             }
-                        };
-                        var rzp1 = new Razorpay(options);
-                        rzp1.on('payment.failed', function (response) {
-                            alert(response.error.code);
-                            alert(response.error.description);
-                            alert(response.error.source);
-                            alert(response.error.step);
-                            alert(response.error.reason);
-                            alert(response.error.metadata.order_id);
-                            alert(response.error.metadata.payment_id);
-                        });
+                        })
+                } else {
+                    console.log(discountID);
+                    fetch("/online-payment-createid", { method: "POST", body: new URLSearchParams({ price: "<%=price%>", discountID }) })
+                        .then(res => {
 
-                        rzp1.open();
+                            console.log(res);
+                            return res.json()
+                        }).then(data => {
+                            console.log(data);
+                            console.log(data.orderId.id);
+                            var options = {
+                                "key": "rzp_test_ISFWvbAXmN0zBI", // Enter the Key ID generated from the Dashboard
+                                "currency": "INR",
+                                "name": "Acme Corp",
+                                "description": "Test Transaction",
+                                "image": "https://example.com/your_logo",
+                                "order_id": data.orderId.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                                "handler": function (response) {
 
-                    })
+                                    document.getElementById("spinnerCh").classList.add("bg-green-600")
+                                    fetch("/new-order", { method: "POST", body: new URLSearchParams({ index: selectedValue, paymentType: "online", totalMRP: JSON.parse(localStorage.getItem('totalMRP')) }) })
+                                        .then(res => {
+                                            if (res.status === 200) {
+                                                window.location.replace("/account/orders")
+                                            }
+                                        })
+
+                                },
+                                // "prefill": {
+                                //     "name": "Gaurav Kumar",
+                                //     "email": "gaurav.kumar@example.com",
+                                //     "contact": "9000090000"
+                                // },
+                                "notes": {
+                                    "address": "Razorpay Corporate Office"
+                                },
+                                "theme": {
+                                    "color": "#3399cc"
+                                }
+                            };
+                            var rzp1 = new Razorpay(options);
+                            rzp1.on('payment.failed', function (response) {
+                                alert(response.error.code);
+                                alert(response.error.description);
+                                alert(response.error.source);
+                                alert(response.error.step);
+                                alert(response.error.reason);
+                                alert(response.error.metadata.order_id);
+                                alert(response.error.metadata.payment_id);
+                            });
+
+                            rzp1.open();
+
+                        })
+                }
+
             }
 
-        }
-
-    </script>
+        </script>

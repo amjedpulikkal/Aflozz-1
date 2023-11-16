@@ -107,4 +107,27 @@ async function sharp_up(req, res, next) {
         next()
  
 }
-module.exports = { nouser, ifuser, sharp_up, ifadmin, noadmin, sharp_pro ,sharp_cat}
+async function sharp_not(req, res, next) {
+    if(req.file){
+        const imageName = `${Date.now()}${Math.round() * 1000}${req.file.originalname}`
+        req.body.image = imageName
+        console.log("req.body");
+        console.log(req.body);
+        console.log("req.body");
+        sharp(req.file.buffer).resize(192, 192).toFile(path.join(__dirname, "../public/image/notification/", imageName), (err, info) => {
+            if (err) {
+                console.log(err);
+                // Handle error
+                return res.status(500).send('Error processing image');
+            }else{
+                next()
+            }
+        })
+    }else{
+        next()
+    }
+ 
+}
+
+
+module.exports = {sharp_not, nouser, ifuser, sharp_up, ifadmin, noadmin, sharp_pro ,sharp_cat}

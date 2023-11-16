@@ -2,7 +2,7 @@ const express = require("express")
 const router = express.Router()
 require('dotenv').config();
 const multer = require("multer")
-const { ifadmin, noadmin, sharp_pro, sharp_up, sharp_cat } = require("../model/aouth")
+const { ifadmin, noadmin, sharp_pro, sharp_up, sharp_cat,sharp_not } = require("../model/aouth")
 const adminController = require("../controller/adminCoantroller")
 const productCantroller = require("../controller/productCoantroller")
 const categoryCantroller = require("../controller/categoryCantroller")
@@ -13,6 +13,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage })
 
 router.get("/", ifadmin, adminController.getAdmin)
+router.get("/sales-report", ifadmin, adminController.getSalse)
 router.post("/getReport", ifadmin, adminController.salseReport)
 router.route("/login", noadmin).get(adminController.getLogin).post(adminController.postLogin)
 
@@ -46,8 +47,17 @@ router.get("/all-user", ifadmin, userCantroller.getAll)
 router.get("/block", ifadmin, userCantroller.block)
 
 router.get("/orders",ifadmin,adminController.getOrder)
+router.get("/orders/return",ifadmin,adminController.returnOrder)
 router.get("/orders/:id",ifadmin,adminController.orderD)
 router.post("/orders/update/:id",ifadmin,adminController.updateOrder)
+
+
+router.post("/send",ifadmin ,upload.single("image"),sharp_not,adminController.send)
+router.get("/notification",ifadmin,adminController.notification)
+
+
+
+
 
 
 router.get("/logout", ifadmin, async (req, res) => {

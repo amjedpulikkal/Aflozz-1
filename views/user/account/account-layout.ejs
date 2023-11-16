@@ -1,6 +1,6 @@
 <link rel="stylesheet" href="/profile-style.css">
 
-<div class="profile-header" style="z-index: -1;">
+<div class="profile-header mt-16" style="z-index: -1;" >
     <!-- <div class="profile-img">
         <img src="" width="200" alt="Profile Image">
     </div> -->
@@ -10,8 +10,15 @@
             <p id="state" class="state"><%=user.Email%></p>
             <!-- <span id="country" class="country"></span> -->
         </div>
+        <div class=" flex items-center b">
+
+            <img width="32" height="32" src="https://img.icons8.com/windows/32/wallet.png" alt="wallet"/>
+            <h1 class="text-xl ms-2"> ₹ </h1> <p class="text-lg"> <%=user?.wallet|| 0%></p>
+        </div>
+        <!-- <p>Wallet </p> -->
 
     </div>
+    
 </div>
 <div class="main-bd">
     <div class="right-side">

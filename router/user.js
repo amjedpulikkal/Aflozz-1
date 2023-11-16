@@ -5,7 +5,6 @@ const jwt = require("../model/JWT")
 const nocache = require("nocache")
 const { ifuser, nouser } = require("../model/aouth")
 const userController = require("../controller/userCantroller")
-const webpush = require('web-push');
 
 
 
@@ -41,7 +40,12 @@ router.get("/address/edit/:id",ifuser,userController.editAddress)
 router.get("/new-address",ifuser,userController.newAddress)
 router.post("/new-order",ifuser,userController.newOrder)
 router.get("/order/cancel/:id",ifuser,userController.cancelOrder)
+router.post("/order/return/:id",ifuser,userController.returnOrder)
 router.get("/account",ifuser,userController.getAccount)
+
+
+router.post("/subscribe",ifuser,userController.webPush)
+
 
 // router.get("/socket/status",ifuser,userController.orderStatus)
 
@@ -49,26 +53,11 @@ router.post("/online-payment-createid",ifuser,userController.onlinePayment)
 
 router.get("/promo/:code",ifuser,userController.couponCode)
 
+router.route("/chat").get(ifuser,userController.chat).post(ifuser,userController.sendMassage)
+// router.get("/re")
 
-// const vapidKeys = {
-//     publicKey: 'BKLxNKnkxc-TdjswVmjljwTFPS20B58T7EWlNiDlAtu0dVee3SttxpugNeINTjpckj6fb1X6dlHCedYGYiWJ_6w',  // Replace with your actual public key
-//     privateKey: 'gmO-2wk-Ssk-M-D2c6ZGtdAFVCkCNJ0XC7UrfE1QT4E' // Replace with your actual private key
-// };
 
-// webpush.setVapidDetails(
-//     'mailto:manuamjed32@gmail.com', // Your email
-//     vapidKeys.publicKey,
-//     vapidKeys.privateKey
-// );
 
-// const subscriptions = [{
-//     endpoint: 'https://fcm.googleapis.com/fcm/send/dE-Wgbo91Y0:APA91bHuHISLN1wI00av6c8Mn-3t7n3hDFrs5rzy_hW3YhT90l9vTgOdDNa5tbMBzXlXWtbglq1mgXcjj37-qtbcvu_SOBIcsv0WvGX9rLEYKscZXsUunXUSDdnXEckibDumyfYVxEml',
-//     expirationTime: null,
-//     keys: {
-//       p256dh: 'BHaRJBkF7hTxNzrMsuTFp1pvOn9zglZA8pZ71-U5rRNsPaKgjFVCuy9sg1oo_gkiUm7-x5PkWA9IyuNNBDxeUCo',
-//       auth: 'mciTdIAmj_gqZRPmTg9Akw'
-//     }
-//   }];
 
 // router.post('/subscribe', (req, res) => {
 //     const subscription = req.body;

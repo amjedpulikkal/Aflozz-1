@@ -8,7 +8,8 @@
                         <div class="flex justify-between">
 
                             <div class="flex justify-start item-start space-y-2 flex-col">
-                                <h1 class="text-3xl  lg:text-4xl font-semibold leading-7 lg:leading-9 text-gray-100">Order #
+                                <h1 class="text-3xl  lg:text-4xl font-semibold leading-7 lg:leading-9 text-gray-100">
+                                    Order #
                                     <%=data._id%>
                                 </h1>
                                 <p class="text-base  font-medium leading-6 ">
@@ -18,54 +19,83 @@
                             <%if(data.status.length<3 && !data.cancel){%>
 
                                 <div><button onclick="cancel('<%=data._id%>')" class="pd-setting">Cancel</button></div>
+
                                 <%}%>
                         </div>
-                       
                         <h3 class="text-xl  font-semibold leading-5 text-gray-100">Shipping</h3>
                         <div class="container">
                             <div class="row-auto">
                                 <div class="col-12 col-10 hh-grayBox pt-4">
                                     <div class="flex justify-between">
-                                        <%if(!data.cancel){%>
-                                        <div class="order-tracking <%= (data.status.length>=1) ? 'completed' : '' %>"
-                                            <% if(data.status.length < 1){%>  data-modal-target="defaultModal" data-modal-toggle="defaultModal" <%}%> >
-                                            <span onclick="status(1)" class="is-complete <%= (data.status.length<1) ? 'cursor-pointer' : '' %>"></span>
-                                            <p>Ordered<br>  <%= (data.status[0]?.date) ? data.status[0]?.date : '' %></p>
-                                        </div>
-                                        <div class="order-tracking 	 <%= (data.status.length>=2) ? 'completed' : '' %>"
-                                            <% if(data.status.length < 2){%>  data-modal-target="defaultModal" data-modal-toggle="defaultModal" <%}%> >
-                                            <span onclick="status(2)" class="is-complete  <%= (data.status.length<2) ? 'cursor-pointer' : '' %>"></span>
-                                            <p>Shipped<br><span><%= (data.status[2]?.date) ? data.status[0]?.date : '' %></span></p>
-                                        </div>
-                                        <div class="order-tracking 	<%= (data.status.length >=3) ? 'completed' : '' %>"
-                                            <% if(data.status.length < 3){%>  data-modal-target="defaultModal" data-modal-toggle="defaultModal" <%}%> >
-                                            <span onclick="status(3)" class="is-complete  <%= (data.status.length<3) ? 'cursor-pointer' : '' %>"></span>
-                                            <p>Delivered<br><span><%= (data.status[2]?.date) ? data.status[0]?.date : '' %></span></p>
-                                        </div>
-                                        <%}else{%>
-                                            <div
-                                            class="order-tracking cancel">
-                                            <span class="is-complete"></span>
-                                            <p>Canceld<br><span>
-                                                    <%= (data.status[0]?.date) ? data.status[0]?.date : '' %>
-                                                </span></p>
-                                        </div>
-                                        <div
-                                            class="order-tracking cancel">
-                                            <span class="z-10 text-white">Canceld</span>
-                                           
-                                        </div>
-                                        <div
-                                            class="order-tracking  cancel">
-                                            <span class="is-complete"></span>
-                                            <p>Canceld<br><span>
-                                                    <%= (data.status[2]?.date) ? data.status[2]?.date : '' %>
-                                                </span></p>
-                                        </div>
-                                            
-                                            
-                                            
-                                            <%}%>
+                                        <%if(!data.cancel && !data.return){%>
+                                            <div class="order-tracking <%= (data.status.length>=1) ? 'completed' : '' %>"
+                                                <% if(data.status.length < 1){%> data-modal-target="defaultModal"
+                                                data-modal-toggle="defaultModal" <%}%> >
+                                                    <span onclick="status(1)"
+                                                        class="is-complete <%= (data.status.length<1) ? 'cursor-pointer' : '' %>"></span>
+                                                    <p>Ordered<br>
+                                                        <%= (data.status[0]?.date) ? data.status[0]?.date : '' %>
+                                                    </p>
+                                            </div>
+                                            <div class="order-tracking 	 <%= (data.status.length>=2) ? 'completed' : '' %>"
+                                                <% if(data.status.length < 2){%> data-modal-target="defaultModal"
+                                                data-modal-toggle="defaultModal" <%}%> >
+                                                    <span onclick="status(2)"
+                                                        class="is-complete  <%= (data.status.length<2) ? 'cursor-pointer' : '' %>"></span>
+                                                    <p>Shipped<br><span>
+                                                            <%= (data.status[2]?.date) ? data.status[0]?.date : '' %>
+                                                        </span></p>
+                                            </div>
+                                            <div class="order-tracking 	<%= (data.status.length >=3) ? 'completed' : '' %>"
+                                                <% if(data.status.length < 3){%> data-modal-target="defaultModal"
+                                                data-modal-toggle="defaultModal" <%}%> >
+                                                    <span onclick="status(3)"
+                                                        class="is-complete  <%= (data.status.length<3) ? 'cursor-pointer' : '' %>"></span>
+                                                    <p>Delivered<br><span>
+                                                            <%= (data.status[2]?.date) ? data.status[0]?.date : '' %>
+                                                        </span></p>
+                                            </div>
+                                            <%}else if(data.cancel && !data.return){%>
+                                                <div class="order-tracking cancel">
+                                                    <span class="is-complete"></span>
+                                                    <p>Canceld<br><span>
+                                                            <%= (data.status[0]?.date) ? data.status[0]?.date : '' %>
+                                                        </span></p>
+                                                </div>
+                                                <div class="order-tracking cancel">
+                                                    <span class="z-10 text-white">Canceld</span>
+
+                                                </div>
+                                                <div class="order-tracking  cancel">
+                                                    <span class="is-complete"></span>
+                                                    <p>Canceld<br><span>
+                                                            <%= (data.status[2]?.date) ? data.status[2]?.date : '' %>
+                                                        </span></p>
+                                                </div>
+
+
+
+                                                <%}else{%>
+
+                                                    <div style="width: 50%;"
+                                                        class="order-tracking <%= (data.return.length >=1) ? 'completed' : '' %>">
+                                                        <span class="is-complete"></span>
+                                                        <p>Ordered<br><span>
+                                                                <%= (data.return[0]?.date) ? data.return[0]?.date : ''
+                                                                    %>
+                                                            </span></p>
+                                                    </div>
+
+                                                    <div style="width: 50%;"
+                                                        class="order-tracking  <%= (data.return.length >=2) ? 'completed' : '' %>">
+                                                        <span class="is-complete"></span>
+                                                        <p>Delivered<br><span>
+                                                                <%= (data.return[2]?.date) ? data.return[2]?.date : ''
+                                                                    %>
+                                                            </span></p>
+                                                    </div>
+
+                                                    <%}%>
                                     </div>
                                 </div>
                             </div>
@@ -82,7 +112,9 @@
                                             class="flex justify-center items-center w-full space-y-4 flex-col border-gray-200 border-b pb-4">
                                             <div class="flex justify-between w-full">
                                                 <p class="text-base  leading-4 text-gray-100">Subtotal</p>
-                                                <p class="text-base leading-4 text-gray-600 "><%=data.totalMRP%></p>
+                                                <p class="text-base leading-4 text-gray-600 ">
+                                                    <%=data.totalMRP%>
+                                                </p>
                                             </div>
                                             <div class="flex justify-between items-center w-full">
                                                 <p class="text-base  leading-4 text-gray-100">Discount
@@ -184,8 +216,8 @@
     </div>
 </div>
 <%if(data.status.length<=3){%>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.css" rel="stylesheet" />
-<!-- Modal toggle -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.css" rel="stylesheet" />
+    <!-- Modal toggle -->
     <div id="defaultModal" tabindex="-1" aria-hidden="true"
         class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
         <div class="relative w-full max-w-2xl max-h-full">
@@ -220,27 +252,32 @@
                 </form>
             </div>
         </div>
-    </d>
-    <%}%>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.js"></script>
+        </d>
+        <%}%>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.js"></script>
 
-        <script>
-            function cancel(id) {
-        
-                fetch('/order/cancel/' + id)
-                    .then(res => {
-                        if (!res.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return res.json();
-                    })
-                    .then(data => {
-                        window.location.reload()
-                        console.log(data);
-                    })
-                    .catch(error => {
-                        console.error('Fetch error:', error);
-                    });
-        
-            }
-        </script>
+            <script>
+                function cancel(id) {
+
+                    fetch('/order/cancel/' + id)
+                        .then(res => {
+                            if (!res.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return res.json();
+                        })
+                        .then(data => {
+                            window.location.reload()
+                            console.log(data);
+                        })
+                        .catch(error => {
+                            console.error('Fetch error:', error);
+                        });
+
+                }
+            </script>
+
+
+
+
+<p>filter</p>

@@ -128,10 +128,10 @@
 
 </div>
 <div class="">
-  <div class="grid grid-cols-4" >
+  <div class="grid grid-cols-4 mt-12 mx-4 ">
     <% products.forEach(function(item) { %>
       <div
-        class=" mt-6 flex w-full max-w-xs flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-md">
+        class="mt-12  flex w-full max-w-xs flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-md">
         <a class=" mx-3 mt-3  h-60 overflow-hidden rounded-xl" href="/product/<%=item._id%>">
           <img class="object-cover" src="/image/products/<%=item.image[0]%>" alt="product image" />
           <% if(item.discount!=0){%>
@@ -205,39 +205,74 @@
         </div>
       </div>
       <% }); %>
-    </div>
   </div>
-
-  <script>
-    function addtocart(id) {
-      document.getElementById(`but-${id}`).classList.add("hidden")
-      document.getElementById(`spinner-${id}`).classList.remove("hidden")
-      console.log("goooo");
-      console.log(id);
-      fetch(`/cart/${id}`, {
-        method: "POST"
-      })
-        .then(res => {
-          console.log(res);
-          $(document).ready(function () {
-            function c() {
-              $(".flash-2").addClass("animate--drop-in-fade-out");
-              setTimeout(function () {
-                $(".flash-2").removeClass("animate--drop-in-fade-out");
-              }, 3500);
-            };
-            c()
-          });
-          res.json().then(data => {
-            document.getElementById(`but-${id}`).classList.remove("hidden")
-            document.getElementById(`spinner-${id}`).classList.add("hidden")
-            document.getElementById("cartCount")?.classList.remove("hidden")
-            document.getElementById("cartN-1").innerHTML = data.cartLength
-          })
+</div>
+<div class="w-full flex items-center justify-center mt-5 mb-5">
+  <nav aria-label="Page navigation example">
+    <ul class="inline-flex -space-x-px text-sm">
+      <li>
+        <a href="#"
+          class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">Previous</a>
+      </li>
+      <li>
+        <a href="#"
+          class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">1</a>
+      </li>
+      <li>
+        <a href="#"
+          class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">2</a>
+      </li>
+      <li>
+        <a href="#" aria-current="page"
+          class="flex items-center justify-center px-3 h-8 text-blue-600 border border-gray-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white">3</a>
+      </li>
+      <li>
+        <a href="#"
+          class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">4</a>
+      </li>
+      <li>
+        <a href="#"
+          class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">5</a>
+      </li>
+      <li>
+        <a href="#"
+          class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">Next</a>
+      </li>
+    </ul>
+  </nav>
+</div>
+<!-- </div> -->
+<script>
+  function addtocart(id) {
+    document.getElementById(`but-${id}`).classList.add("hidden")
+    document.getElementById(`spinner-${id}`).classList.remove("hidden")
+    console.log("goooo");
+    console.log(id);
+    fetch(`/cart/${id}`, {
+      method: "POST"
+    })
+      .then(res => {
+        console.log(res);
+        $(document).ready(function () {
+          function c() {
+            $(".flash-2").addClass("animate--drop-in-fade-out");
+            setTimeout(function () {
+              $(".flash-2").removeClass("animate--drop-in-fade-out");
+            }, 3500);
+          };
+          c()
+        });
+        res.json().then(data => {
+          document.getElementById(`but-${id}`).classList.remove("hidden")
+          document.getElementById(`spinner-${id}`).classList.add("hidden")
+          document.getElementById("cartCount")?.classList.remove("hidden")
+          document.getElementById("cartN-1").innerHTML = data.cartLength
         })
-    }
-  </script>
-  <!-- <script>
+      })
+  }
+
+</script>
+<!-- <script>
   $(document).ready(function() {
    function c() {
       $(".flash-2").addClass("animate--drop-in-fade-out");

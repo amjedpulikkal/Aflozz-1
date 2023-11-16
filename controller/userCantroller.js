@@ -4,12 +4,16 @@ const userModel = require("../model/userModel")
 const productModel = require("../model/productModel")
 const { sendmailForPassword } = require("../model/nodemailer")
 const Razorpay = require("razorpay")
+const { db_coupon } = require("../model/db")
+const { ObjectId } = require("mongodb");
 require("dotenv").config()
 module.exports = {
   getHome: async (req, res) => {
-    const products = await productModel.ufind_product()
+    const limit = parseInt(req.query.limit)|| 0
+    console.log(req.query)
+    const {products ,totalproduct} = await productModel.ufind_product(limit)
     console.log(products)
-    res.render("user/home", { layout: "user/layout", products, titel: "Aflozz" ,cartLength:req.session.user.cart.length})
+    res.render("user/home", { layout: "user/layout", products, titel: "Aflozz" ,cartLength:req.session.user.cart.length,user:req.session.user,totalproduct})
 
   },
   getlogin: (req, res) => {
@@ -39,7 +43,7 @@ module.exports = {
       const id = req.params.id
       const product = await productModel.findOne_product(id)
       console.log(product);
-      res.render("user/products", { layout: "user/layout", product, titel: "Aflozz" ,cartLength:req.session.user.cart.length})
+      res.render("user/products", { layout: "user/layout", product, titel: "Aflozz" ,cartLength:req.session.user.cart.length,user:req.session.user})
     } catch (error) {
       console.log(error);
     }
@@ -164,7 +168,7 @@ module.exports = {
   },
   block: async (req, res) => {
     console.log(req.query);
-    categoryModel.user_status(req.query).then(d => {
+    userModel.user_status(req.query).then(d => {
       console.log(d);
       res.redirect("/admin/all-user")
     }).catch(err => {
@@ -176,10 +180,10 @@ module.exports = {
       const products = await userModel.findCart(req.session.user._id)
       if (products) {
         const data = await userModel.getAmount(req.session.user._id)
-        res.render("user/cart", { layout: "user/layout", titel: "Aflozz-cart", products, price: data,cartLength:req.session.user.cart.length })
+        res.render("user/cart", { layout: "user/layout", titel: "Aflozz-cart", products, price: data,cartLength:req.session.user.cart.length,user:req.session.user })
       } else {
 
-        res.render("user/cart", { layout: "user/layout", titel: "Aflozz-cart", products: [], price: 0 ,cartLength:req.session.user.cart.length})
+        res.render("user/cart", { layout: "user/layout", titel: "Aflozz-cart", products: [], price: 0 ,cartLength:req.session.user.cart.length,user:req.session.user })
       }
     } catch (err) {
       console.log(err);
@@ -234,7 +238,7 @@ module.exports = {
       const address = req.session.user.address
       console.log(address);
       const price = await userModel.getAmount(req.session.user._id)
-      res.render("user/address", { layout: "user/layout", titel: "Aflozz-cart", price, address ,cartLength:req.session.user.cart.length,coupon:req.session?.coupon})
+      res.render("user/address", { layout: "user/layout", titel: "Aflozz-cart", price, address ,cartLength:req.session.user.cart.length,coupon:req.session?.coupon,user:req.session.user })
     } catch (err) {
       console.log(err);
     }
@@ -248,13 +252,13 @@ module.exports = {
       orders.forEach(i => { i.date = new Date(i.date).toLocaleDateString('en-US', options) });
       orders.forEach(i => { i.status.forEach(i => { i.date = new Date(i.date).toLocaleDateString('en-US', options) }) });
       console.log(orders[0].status[0]);
-      res.render("user/account/order", { layout: "user/layout", titel: "Aflozz-cart", selection: "order", orders, user: req.session.user ,cartLength:req.session.user.cart.length})
+      res.render("user/account/order", { layout: "user/layout", titel: "Aflozz-cart", selection: "order", orders, user: req.session.user ,cartLength:req.session.user.cart.length,user:req.session.user })
     } catch (err) {
       console.log(err);
     }
   },
   newOrder: async (req, res) => {
-    req.session.coupon = null
+    
     const id = req.session.user._id
     const data = {}
     const index = Number(req.body.index)
@@ -263,6 +267,17 @@ module.exports = {
     data.price = await userModel.getAmount(id)
     data.products = req.session.user.cart
     data.totalMRP = req.body.totalMRP
+    data.paymentType = req.body.paymentType
+
+    if(req.session.coupon){
+      const discount = await userModel.claimCoupon(req.session.coupon?._id,req.session.user._id)
+      if(discount?.value>=req.body.price){
+        console.log(discount);
+        data.price -=discount?.value || 0  
+      }
+    }
+    req.session.coupon = null
+
     // await userModel.degress(data.products)
     await userModel.newOrder(id, data)
     await userModel.removeCart(id)
@@ -271,7 +286,7 @@ module.exports = {
   },
   getAccount: async (req, res) => {
     const address = req.session.user.address
-    res.render("user/account/address", { layout: "user/layout", titel: "Aflozz-Account", selection: "address", address, user: req.session.user,cartLength:req.session.user.cart.length })
+    res.render("user/account/address", { layout: "user/layout", titel: "Aflozz-Account", selection: "address", address, user: req.session.user,cartLength:req.session.user.cart.length,user:req.session.user })
   },
   newAdress: async (req, res) => {
     const user_id = req.session.user._id
@@ -289,7 +304,7 @@ module.exports = {
     orders.status.forEach(i => { i.date = new Date(i.date).toLocaleDateString('en-US', options) })
     console.log(orders);
     console.log(products);
-    res.render("user/account/order-items", { layout: "user/layout", titel: "Aflozz-Account", selection: "order", data: orders, products, user: req.session.user,cartLength:req.session.user.cart.length})
+    res.render("user/account/order-items", { layout: "user/layout", titel: "Aflozz-Account", selection: "order", data: orders, products, user: req.session.user,cartLength:req.session.user.cart.length,user:req.session.user })
 
   },
   addressRemove: async (req, res) => {
@@ -298,18 +313,18 @@ module.exports = {
     res.redirect("/account")
   },
   profil: async (req, res) => {
-    res.render("user/account/profile", { layout: "user/layout", titel: "Aflozz-Account", selection: "profil", user: req.session.user,cartLength:req.session.user.cart.length })
+    res.render("user/account/profile", { layout: "user/layout", titel: "Aflozz-Account", selection: "profil", user: req.session.user,cartLength:req.session.user.cart.length,user:req.session.user })
   },
   cancelOrder: async (req, res) => {
     const id = req.params.id
     console.log(id);
     console.log("---------------------------------------------");
-    await userModel.cancelOrder(id)
+    await userModel.cancelOrder(id,req.session.user._id)
     console.log("---------------------------------------------");
     res.status(200).json("ok")
   },
 
-  
+
   changePassword: async (req, res) => {
 
     const id = req.session.user._id
@@ -324,20 +339,24 @@ module.exports = {
     })
   },
   newAddress: async (req, res) => {
-    res.render("user/newAddress", { layout: "user/layout", titel: "Aflozz-Account", data: null,cartLength:req.session.user.cart.length})
+    res.render("user/newAddress", { layout: "user/layout", titel: "Aflozz-Account", data: null,cartLength:req.session.user.cart.length,user:req.session.user })
   },
   editAddress: async (req, res) => {
     const index = req.params.id
     const data = await userModel.findaddress(req.session.user._id, index)
     console.log(data);
-    res.render("user/newAddress", { layout: "user/layout", titel: "Aflozz-Account", data,cartLength:req.session.user.cart.length})
+    res.render("user/newAddress", { layout: "user/layout", titel: "Aflozz-Account", data,cartLength:req.session.user.cart.length,user:req.session.user })
 
   },
   onlinePayment:async (req,res)=>{
     try {
       console.log(req.body);
-      if(Number(req.body.discount)){
-        req.body.price -=req.body.discount
+      if(ObjectId.isValid(req.body.discountID)){
+        const discount = await db_coupon.findOne({_id:new ObjectId(req.body.discountID)})
+        if(discount?.value<=req.body.price){
+          console.log(discount);
+          req.body.price -=discount?.value || 0  
+        }
       }
       console.log(req.body);
       
@@ -363,18 +382,37 @@ module.exports = {
   },
   couponCode:async(req,res)=>{
     const code = req.params.code
-    const coupon = await userModel.claimCoupon(code,req.session.user._id)
+    const coupon = await userModel.findCoupon(code,req.session.user._id)
+    console.log("coupon");
     console.log(coupon);
-    if (coupon.value){
-      req.session.coupon = coupon.value
-      res.json(coupon.value)
+    if(coupon?.value){
+      req.session.coupon = coupon
+      res.json(coupon)
     }else{
       res.json(false)
     }
-  }
- 
-  
+  },
+  chat:async(req,res)=>{
+    const message = await userModel.getMessage()
+    res.render("user/chat",{layout:"user/layout",titel:"chat",cartLength:req.session.user.cart.length,user:req.session.user})
+  },
+  sendMassage:async(req,res)=>{
+    console.log("-------------------");
+    console.log(req.body);
+    console.log("-------------------");
+    await userModel.addMessage(req.session.user._id,req.body)
 
-
-
+    res.json("ok")
+  },
+   returnOrder:async (req,res)=>{
+        const id = req.params.id
+         await userModel.returnOrder(id,req.body,req.session.user._id)
+         res.status(200).json("")
+    },
+    webPush:async(req,res)=>{
+      const data = req.body
+      console.log(data);
+      await userModel.webPush(req.session.user._id ,data)
+      res.status(200).json("")
+    }
 }

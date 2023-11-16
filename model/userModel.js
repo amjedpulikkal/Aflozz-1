@@ -1,21 +1,44 @@
 const { ObjectId } = require("mongodb");
-const { db_user, db_order, db_product, db_otp, db_coupon } = require("./db");
+const { db_user, db_order, db_product, db_otp, db_coupon, db_community, db_notification, db_subscription } = require("./db");
 const { decryption, encryption } = require("./crypto");
 
 // Other required modules and dependencies
 
 module.exports = {
-    async claimCoupon(code,userId){
-        return await db_coupon.findOneAndUpdate({code,Limet:{$gt:0},user:{ $not: { $elemMatch: { $eq: new ObjectId(userId) } }},exDate:{$gte:new Date()}},{$inc:{Limet:-1},$push:{user:new ObjectId(userId)}})
+    async returnOrder(id,data,userId){
+        data.date = new Date()
+        // return await db_order.updateOne({_id:new ObjectId(id)},})
+        const product = await db_order.findOneAndUpdate({ _id: new ObjectId(id) },{$push:{return:data}})
+       
+        console.log(product.value);
+        if(product.return >=1){
+            await db_user.updateOne({_id:new ObjectId(userId)},{$set:{wallet:product.value.totalMRP}})
+        }
+        return product
+    },
+    async getMessage(data){
+        return await db_community.find().limit(5).toArray()
+    },
+    async addMessage(id,data){
+        data.date = new Date()
+      return await db_community.insertOne({userId:new ObjectId(id),data})
+    },
+    async findCoupon(code,userId){
+        return await db_coupon.findOne({code,Limet:{$gt:0},user:{ $not: { $elemMatch: { $eq: new ObjectId(userId) } }},exDate:{$gte:new Date()}})
+    },
+    async claimCoupon(id,userId){
+        return await db_coupon.findOneAndUpdate({_id:new ObjectId(id),Limet:{$gt:0},user:{ $not: { $elemMatch: { $eq: new ObjectId(userId) } }},exDate:{$gte:new Date()}},{$inc:{Limet:-1},$push:{user:new ObjectId(userId)}})
     },
     async updataUserPresence(id,presence) {
         console.log(presence);
         console.log(id)
         return await db_user.updateOne({_id:new ObjectId(id)},{$set:{presence}})
     },
+    async checkUserPresence(id) {
+        return await db_user.findOne({_id:new ObjectId(id),presence:"online"})
+    },
     async findaddress(id, index) {
-        const user = await db_user.findOne({ _id: new ObjectId(id) })
-
+        const user = await db_user.findOne({ _id: new ObjectId(id)})
         return user.address[index]
     },
     async changePassword(id, data) {
@@ -35,15 +58,34 @@ module.exports = {
 
 
     },
-    async cancelOrder(id) {
+    async cancelOrder(id,userId) {
 
         const product = await db_order.findOneAndUpdate({ _id: new ObjectId(id) }, { $set: { cancel: true } })
+       
+        console.log(product.value);
+         
+        if(product.value.paymentType=="online"){
+            await db_user.updateOne({_id:new ObjectId(userId)},{$set:{wallet:product.value.totalMRP}})
+        }
         product.value.products.forEach(async (element) => {
             const n = element.quantity
             await db_product.updateOne({ _id: element._id }, { $inc: { stock: n } })
         });
         return product
     },
+    // async orderReturn(id) {
+
+    //     const product = await db_order.findOneAndUpdate({ _id: new ObjectId(id) }, { $set: { return: true } })
+    //     console.log(product.value);
+      
+    //         await db_user.updateOne({_id:new ObjectId(userId)},{$set:{wallet:product.value.totalMRP}})
+        
+    //     // product.value.products.forEach(async (element) => {
+    //     //     const n = element.quantity
+    //     //     await db_product.updateOne({ _id: element._id }, { $inc: { stock: n } })
+    //     // });
+    //     return product
+    // },
     async removeAddress(id, index) {
         await db_user.updateOne({ _id: new ObjectId(id) }, { $unset: { [`address.${index}`]: 1 } })
         await db_user.updateOne({ _id: new ObjectId(id) }, { $pull: { address: null } })
@@ -96,7 +138,7 @@ module.exports = {
             }]).toArray()
         // console.log(order[0].products);
 
-        return order[0].products
+        return order[0]?.products
 
     }
     ,
@@ -431,4 +473,8 @@ module.exports = {
         return await db_otp.insertOne(data)
 
     },
+    async webPush(id,webPush){
+        webPush.userId = new ObjectId(id)   
+        return await db_subscription.insertOne(webPush)
+    }
 };

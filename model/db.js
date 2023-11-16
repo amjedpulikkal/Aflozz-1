@@ -33,6 +33,9 @@ const db_order = clint.db(db).collection("order")
 const db_category = clint.db(db).collection("category")
 const db_otp = clint.db(db).collection("Otp")
 const db_coupon = clint.db(db).collection("coupon")
+const db_community = clint.db(db).collection("community")
+const db_notification =clint.db(db).collection("notification")
+const db_subscription =clint.db(db).collection("subscription")
 module.exports = {
     db_order,
     db_user,
@@ -40,7 +43,10 @@ module.exports = {
     db_product,
     db_category,
     db_otp,
-    db_coupon
+    db_coupon,
+    db_community,
+    db_notification,
+    db_subscription,
 }
 
 // async function storeOtp(data) {

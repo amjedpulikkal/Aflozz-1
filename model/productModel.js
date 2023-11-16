@@ -14,7 +14,6 @@ module.exports = {
             throw errr
         }
     },
-
     async add_product(data) {
         try {
             data.price = Number(data.price)
@@ -34,9 +33,12 @@ module.exports = {
             throw errr
         }
     },
-    async ufind_product(data) {
+    async ufind_product(limit) {
         try {
-            return await db_product.find({ $and: [{ stock: { $ne: "0" } }, { status: true }] }).toArray()
+             
+            const products = await db_product.find({ $and: [{ stock: { $ne: "0" } }, { status: true }] }).skip(limit).limit(8).toArray()
+            const totalproduct = await db_product.countDocuments({ $and: [{ stock: { $ne: "0" } }, { status: true }] })
+            return {products,totalproduct}
         } catch (errr) {
             console.log(errr);
             throw errr
@@ -104,6 +106,4 @@ module.exports = {
             throw errr
         }
     },
-
-
 }

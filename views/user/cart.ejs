@@ -177,12 +177,12 @@
                                 <button class="qty-count qty-count--add" data-action="add" type="button">+</button>
                             </div> -->
                             <div class="flex items-center border-gray-100 " style="width: 100px;">
-                                <span
+                                <span onclick=""
                                     class="cursor-pointer rounded-l bg-gray-200 py-1 px-3.5 duration-100 hover:bg-blue-500 hover:text-blue-50">
                                     - </span>
-                                <input class="h-8 w-8 border bg-white text-black text-center text-xs outline-none"
-                                    type="number" value="2" min="1" readonly style="font-size: medium; " />
-                                <span
+                                <input id="quantitySelect<%=i%>" class="h-8 w-8 border bg-white text-black text-center text-xs outline-none"
+                                    type="number" value="<%=products[i].quantity%>" min="1" readonly style="font-size: medium; " />
+                                <span onclick=""
                                     class="cursor-pointer rounded-r bg-gray-200 py-1 px-3 duration-100 hover:bg-blue-500 hover:text-blue-50">
                                     + </span>
                             </div>
@@ -268,6 +268,8 @@
 
             const qtyMin = parseInt(productQty.getAttribute("min"));
             const qtyMax = parseInt(productQty.getAttribute("max"));
+
+            
 
             productQty.addEventListener("change", function () {
                 const qty = parseInt(productQty.value);
@@ -371,7 +373,12 @@
         totalMRP += Number(price.getAttribute("data-product-price")) * Number(selectElement.value)
         price.innerHTML = total - dis
         // Add an event listener to detect changes in the selected option
-        selectElement.addEventListener('change', function () {
+        function incress(){
+
+        }
+        
+
+         function addToCart() {
             const selectedValue = selectElement.value;
             let total = Number(price.getAttribute("data-product-price")) * Number(selectElement.value)
             let discount = Number(document.getElementById(`discount${i}`).innerText)
@@ -395,7 +402,7 @@
                 n.json().then(data => console.log(data))
 
             })
-        });
+        }
     }
     console.log("total");
     document.getElementById("F-MRP").innerHTML = totalMRP
