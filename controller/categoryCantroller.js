@@ -1,5 +1,6 @@
+const { unlinkSync } = require("fs-extra");
 const categoryModel = require("../model/categoryModel")
-
+const path = require("path")
 
 module.exports = {
     getCategory:async (req, res) => {
@@ -37,7 +38,7 @@ module.exports = {
     delete: async (req, res) => {
         console.log(req.query);
         const { image, id } = req.query
-        fs.unlinkSync(path.join(__dirname, "../public/image/products/", image))
+        unlinkSync(path.join(__dirname, "../public/image/products/", image))
         console.log(req.params.id);
         const products = await categoryModel.delete_category(id)
         if (products) {

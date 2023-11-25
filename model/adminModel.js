@@ -1,4 +1,4 @@
-const { db_admin, db_order, db_coupon, db_user, db_notification, db_subscription } = require("./db");
+const { db_admin, db_order, db_coupon, db_user, db_notification, db_subscription, db_banner } = require("./db");
 
 
 module.exports = {
@@ -146,7 +146,7 @@ module.exports = {
           topUser:{$max:"$user_id"}
         }
       },
-      {
+      {   
         $addFields: {
           adjustedWeek: {
             $add: [
@@ -330,6 +330,12 @@ module.exports = {
       throw err
     }
 
+  },
+  async createBanner(data){
+    return await db_banner.insertOne(data)
+  },
+  async findBanner(){
+    return await db_banner.find().toArray()
   }
 
 }

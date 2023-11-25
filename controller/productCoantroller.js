@@ -74,6 +74,7 @@ module.exports ={
         try {
             console.log(req.files);
             const data = req.body
+            data.size = req.body.size.replace(/,\s*$/, '').split(',').map(Number)
             data.price = Number(data.price)
             data.discount = Number(data.discount)
             console.log(data);

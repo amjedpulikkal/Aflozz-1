@@ -1,10 +1,13 @@
 const { ObjectId } = require("mongodb");
-const { db_user, db_order, db_product, db_otp, db_coupon, db_community, db_notification, db_subscription } = require("./db");
+const { db_user, db_order, db_product, db_otp, db_coupon, db_community, db_notification, db_subscription, db_banner } = require("./db");
 const { decryption, encryption } = require("./crypto");
 
 // Other required modules and dependencies
 
 module.exports = {
+    async bannser(){
+        return await db_banner.find().toArray()
+    },
     async returnOrder(id,data,userId){
         data.date = new Date()
         // return await db_order.updateOne({_id:new ObjectId(id)},})
@@ -64,8 +67,9 @@ module.exports = {
        
         console.log(product.value);
          
-        if(product.value.paymentType=="online"){
-            await db_user.updateOne({_id:new ObjectId(userId)},{$set:{wallet:product.value.totalMRP}})
+        if(['online','wallet'].includes(product.value.paymentType)){
+            console.log("yessssssssssssssssssssssssssss ");
+            await db_user.updateOne({_id:new ObjectId(userId)},{$inc:{wallet:product.value.price}})
         }
         product.value.products.forEach(async (element) => {
             const n = element.quantity
@@ -96,8 +100,12 @@ module.exports = {
 
         return await db_order.findOneAndUpdate({ _id: new ObjectId(id) }, { $push: { status: data } })
     },
+    async updateReturnOrder(id, data) {
+
+        return await db_order.findOneAndUpdate({ _id: new ObjectId(id) }, { $push: { return: data } })
+    },
     async orderDetails(id) {
-        return await db_order.findOne({ _id: new ObjectId(id) })
+        return await db_order.findOne({ _id:new ObjectId(id) })
     },
     async orderProduct(id) {
         const order = await db_order.aggregate([
@@ -332,7 +340,7 @@ module.exports = {
                         console.log("yes----------------")
                         return await db_user.updateOne({ _id: new ObjectId(user_id), 'cart._id': new ObjectId(product_id) }, { $inc: { 'cart.$.quantity': 1 } })
                     } else {
-                        throw "limet"
+                        throw "limit"
                     }
                 } else {
                     console.log("no----------------")
@@ -476,5 +484,9 @@ module.exports = {
     async webPush(id,webPush){
         webPush.userId = new ObjectId(id)   
         return await db_subscription.insertOne(webPush)
+    },
+    async wallet(id,amount){
+        return await db_user.updateOne({_id:new ObjectId(id)},{$set:{wallet:amount}})
     }
+  
 };

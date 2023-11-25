@@ -29,6 +29,7 @@ app.use("/admin",adminRouter)
 app.use("/",userRouter)
 app.all("/*",(req,res)=>res.render("404",{layout:"login/layout"}))
 
+require("./model/db.js").connect()
 
 const server = http.createServer((app))
 const{notification}=require("./model/socket.js").Server(server)

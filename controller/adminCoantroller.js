@@ -5,8 +5,8 @@ const { db_notification } = require('../model/db');
 // const {userSockets} = require("./userCantroller")
 
 module.exports = {
-    getSalse:(req,res)=>{
-        res.render("admin/salesReport",{ layout: 'admin/layout' })
+    getSalse: (req, res) => {
+        res.render("admin/salesReport", { layout: 'admin/layout' })
     },
     notification: async (req, res) => {
         const data = await db.getNotification()
@@ -55,6 +55,26 @@ module.exports = {
         //    const socket = userSockets.get(userId)
         //    console.log(socket);
     },
+    updateReturnOrder: async (req, res) => {
+        const id = req.params.id
+        const data = req.body
+        console.log(data);
+        data.date = new Date()
+        const data2 = await userModel.updateReturnOrder(id, data)
+        console.log(data2);
+        res.redirect("/admin/orders")
+        const io = require("../model/socket")
+        const userId = data2.value.user_id.toString()
+        console.log("--------------------------");
+        const userIO = io.userSockets.get(userId)
+        userIO?.emit("status", { orderID: data2.value._id, status: data2.value.status.length })
+        console.log("--------------------------");
+
+
+        //    const userId = data2.userId
+        //    const socket = userSockets.get(userId)
+        //    console.log(socket);
+    },
     orderD: async (req, res) => {
         const id = req.params.id
         const data = await userModel.orderDetails(id)
@@ -74,7 +94,7 @@ module.exports = {
         console.log(orders[0].status[0]?.date);
         res.render("admin/order", { layout: 'admin/layout', orders })
     },
-     
+
     salseReport: async (req, res) => {
         // const data = await db.salseReport()
         // const total = await db.totalSales()
@@ -94,11 +114,11 @@ module.exports = {
             console.log(data);
             res.json(data)
 
-        } else if("Oneday") {
+        } else if ("Oneday") {
             const data = await db.Oneday(start, end, method)
             console.log(data);
             res.json(data)
-        }else{
+        } else {
             const data = await db.Report(start, end)
             console.log("data");
             console.log(data);
@@ -146,7 +166,7 @@ module.exports = {
         const body = req.body
         body.date = new Date()
         console.log(body);
-        const {notification}= require("../app")
+        const { notification } = require("../app")
         await db_notification.insertOne(body)
         const notificationPayload = {
             title: body.title,
@@ -178,11 +198,23 @@ module.exports = {
         webpush.sendNotification(data[0], JSON.stringify(notificationPayload)).then(() => {
             console.log('Notification sent successfully to:');
         })
-         .catch((error) => {
+            .catch((error) => {
                 console.error('Error sending notification to', error);
-         });
+            });
         res.redirect("/admin/notification")
 
+    },
+    banner: async (req, res) => {
+        console.log(req.body);
+        req.body.date = new Date()
+        req.body.status = true
+        await db.createBanner(req.body)
+        res.redirect("/admin/banner")
+
+    },
+    getBanner: async (req, res) => {
+        const data = await db.findBanner()
+        res.render("admin/banner", {layout: "admin/layout" , data})
     }
 
 }

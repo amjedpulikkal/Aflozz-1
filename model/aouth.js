@@ -128,6 +128,27 @@ async function sharp_not(req, res, next) {
     }
  
 }
+async function sharp_ban(req, res, next) {
+    if(req.file){
+        const imageName = `${Date.now()}${Math.round() * 1000}${req.file.originalname}`
+        req.body.image = imageName
+        console.log("req.body");
+        console.log(req.body);
+        console.log("req.body");
+        sharp(req.file.buffer).resize(1024, 640).toFile(path.join(__dirname, "../public/image/notification/", imageName), (err, info) => {
+            if (err) {
+                console.log(err);
+                // Handle error
+                return res.status(500).send('Error processing image');
+            }else{
+                next()
+            }
+        })
+    }else{
+        next()
+    }
+ 
+}
 
 
-module.exports = {sharp_not, nouser, ifuser, sharp_up, ifadmin, noadmin, sharp_pro ,sharp_cat}
+module.exports = {sharp_not, nouser, ifuser, sharp_up, ifadmin, noadmin, sharp_pro ,sharp_cat,sharp_ban}

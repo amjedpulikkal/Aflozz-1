@@ -106,4 +106,17 @@ module.exports = {
             throw errr
         }
     },
+    async search(data){
+        data =data||''
+        const regexPattern = new RegExp(data, 'i'); // 'i' for case-insensitive
+
+        return await db_product.find({
+            $or: [
+                { name: { $regex: regexPattern } },
+                { title: { $regex: regexPattern } },
+                {category: { $regex: regexPattern } }
+            ]
+        }).toArray()
+        
+    }
 }

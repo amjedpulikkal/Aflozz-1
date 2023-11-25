@@ -17,7 +17,6 @@ function varifyction(data) {
     return null
 
   }
-
 }
 
 module.exports = { create_token, varifyction }

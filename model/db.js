@@ -3,11 +3,14 @@ const { ObjectId } = require("mongodb");
 require("dotenv").config()
 const MongoClient = require("mongodb").MongoClient
 
-const url = process.env.DATABASE_URL;
+// const url = process.env.DATABASE_URL;
+const url = "mongodb://127.0.0.1:27017/aflozz";
+
 
 const { decryption, encryption } = require("./crypto");
 
-const clint = new MongoClient(url)
+// const clint = new MongoClient(url)
+const  clint= new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
 
 const db = "aflozz"
 
@@ -16,7 +19,7 @@ async function connect() {
     try {
 
         await clint.connect()
-
+        console.log("Connected successfully to MongoDB");
         return clint
 
     } catch (e) {
@@ -25,7 +28,7 @@ async function connect() {
     }
 
 }
-connect()
+// connect()
 const db_user = clint.db(db).collection("user")
 const db_admin = clint.db(db).collection("admin")
 const db_product = clint.db(db).collection("products")
@@ -36,7 +39,9 @@ const db_coupon = clint.db(db).collection("coupon")
 const db_community = clint.db(db).collection("community")
 const db_notification =clint.db(db).collection("notification")
 const db_subscription =clint.db(db).collection("subscription")
+const db_banner =clint.db(db).collection("banner")
 module.exports = {
+    db_banner,
     db_order,
     db_user,
     db_admin,
@@ -47,6 +52,7 @@ module.exports = {
     db_community,
     db_notification,
     db_subscription,
+    connect,
 }
 
 // async function storeOtp(data) {
