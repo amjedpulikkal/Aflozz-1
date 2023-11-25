@@ -5,6 +5,9 @@
 </style>
 
 
+<!-- SweetAlert CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <body class="bg-gray-100">
     <div class="container mx-auto mt-10">
@@ -232,7 +235,7 @@
                     <div class="flex  justify-between py-6 text-sm uppercase">
                         <span>Discount on MRP</span>
                         <span id="F-d-MRP">
-                            <%=price%>
+                            <%=price.toFixed(2)%>
                         </span>
                     </div>
 
@@ -263,7 +266,7 @@
                                     <div class="flex font-semibold justify-between py-6 text-sm uppercase">
                                         <span>Total cost</span>
                                         <span id="Ftotal">
-                                            <%=price%>
+                                            <%=price.toFixed(2)%>
                                         </span>
                                     </div>
                                     <div class="mt-4 pb-4">
@@ -276,6 +279,21 @@
                                         <input checked id="default-radio-2" type="radio" value="razorpay" name="payment"
                                             class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                                         <label for="default-radio-2" class="ml-2 text-sm font-medium ">Razorpay</label>
+                                    </div>
+                                    <div class="mt-4 pb-4 flex ">
+                                        <input id="default-radio-1" type="radio" value="cashOnDelivery" id="wallet"
+                                            name="payment"
+                                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                        <label for="default-radio-1" class="ml-2 text-sm font-medium ">Wallet</label>
+                                        <div class="ml-2 hidden" id="tick-img">
+                                            <svg xmlns="http://www.w3.org/2000/svg" height="1em" style="fill: #44ff00"
+                                                viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. -->
+
+                                                <path
+                                                    d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z" />
+                                            </svg>
+                                        </div>
+
                                     </div>
                                     <button onclick="sub() " id="chBut"
                                         class="bg-indigo-500 font-semibold hover:bg-indigo-600 py-3 text-sm text-white uppercase w-full">Checkout</button>
@@ -357,20 +375,32 @@
         <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
         <script>
             let discount = Number("<%=coupon?.value%>")
-            let discountID = "<%=coupon?.id%>" || 0
-            let Total = "<%=price%>"
+            let discountID = "<%=coupon?.id%>" || null
+            let Total = "<%=price.toFixed(2)%>"
+            console.log(Total);
+            let wallet = false
+
+            console.log(JSON.parse(localStorage.getItem("wallet")));
+            if (JSON.parse(localStorage.getItem("wallet"))) {
+                wallet = true
+                document.getElementById("tick-img").classList.remove("hidden")
+                let lwallet = Number('<%=user?.wallet.toFixed(2)%>')
+                let total = Number("<%=price.toFixed(2)%>")
+                document.getElementById("Ftotal").innerHTML = (total -= lwallet).toFixed(2)
+
+            }
             if (discount) {
                 console.log(discount + 500);
                 console.log(Total >= discount + 500);
                 if (Total >= discount + 500) {
-                    discountID = data._id
+                    // discountID
                     document.getElementById("Ftotal").innerHTML = Total -= discount
                     document.getElementById("cValue").innerHTML = "-" + discount
 
                 } else {
                     discountID = null
                     document.getElementById("promo").value = "<%=coupon?.code%>"
-                    document.getElementById("E_promo").innerHTML = `You must purchase above ${discount+500}`
+                    document.getElementById("E_promo").innerHTML = `You must purchase above ${discount + 500}`
                 }
             }
             // discount ? document.getElementById("Ftotal").innerHTML = Total -= discount : console.log(false)
@@ -429,17 +459,25 @@
                 console.log(payradioButtons);
                 console.log(payradioButtons.length);
                 if (payradioButtons[0].checked) {
-
+                    localStorage.removeItem("wallet")
                     console.log(Total - discount);
-                    fetch("/new-order", { method: "POST", body: new URLSearchParams({ index: selectedValue, paymentType: "Cash on Delivery", totalMRP: Total - discount }) })
+                    fetch("/new-order", {
+                        method: "POST", headers: {
+                            'Content-Type': 'application/json'
+                        }, body: JSON.stringify({ index: selectedValue, paymentType: "Cash on Delivery", totalMRP: Total - discount, price: "<%=price%>", wallet, discountID })
+                    })
                         .then(res => {
                             if (res.status === 200) {
                                 window.location.replace("/account/orders")
                             }
                         })
-                } else {
+                } else if (payradioButtons[1].checked) {
                     console.log(discountID);
-                    fetch("/online-payment-createid", { method: "POST", body: new URLSearchParams({ price: "<%=price%>", discountID }) })
+                    fetch("/online-payment-createid", {
+                        method: "POST", headers: {
+                            'Content-Type': 'application/json'
+                        }, body: JSON.stringify({ price: "<%=price%>", discountID, wallet })
+                    })
                         .then(res => {
 
                             console.log(res);
@@ -454,10 +492,21 @@
                                 "description": "Test Transaction",
                                 "image": "https://example.com/your_logo",
                                 "order_id": data.orderId.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-                                "handler": function (response) {
+                                "modal": {
+                                    "ondismiss": function () {
+                                        document.getElementById("chBut").classList.remove("hidden")
+                                        document.getElementById("spinnerCh").classList.add("hidden")
 
+                                    }
+                                },
+                                "handler": function (response) {
+                                    localStorage.removeItem("wallet")
                                     document.getElementById("spinnerCh").classList.add("bg-green-600")
-                                    fetch("/new-order", { method: "POST", body: new URLSearchParams({ index: selectedValue, paymentType: "online", totalMRP: JSON.parse(localStorage.getItem('totalMRP')) }) })
+                                    fetch("/new-order", {
+                                        method: "POST", headers: {
+                                            'Content-Type': 'application/json'
+                                        }, body: JSON.stringify({ index: selectedValue, paymentType: "online", totalMRP: JSON.parse(localStorage.getItem('totalMRP'), discountID, wallet) })
+                                    })
                                         .then(res => {
                                             if (res.status === 200) {
                                                 window.location.replace("/account/orders")
@@ -479,18 +528,92 @@
                             };
                             var rzp1 = new Razorpay(options);
                             rzp1.on('payment.failed', function (response) {
-                                alert(response.error.code);
-                                alert(response.error.description);
-                                alert(response.error.source);
-                                alert(response.error.step);
-                                alert(response.error.reason);
-                                alert(response.error.metadata.order_id);
-                                alert(response.error.metadata.payment_id);
+                                // alert(response.error.code);
+                                // alert(response.error.description);
+                                // alert(response.error.source);
+                                // alert(response.error.step);
+                                // alert(response.error.reason);
+                                // alert(response.error.metadata.order_id);
+                                // alert(response.error.metadata.payment_id);
+                                console.log("failed----");
                             });
+                            rzp1.on("payment.close")
+                            console.log(rzp1.on());
 
                             rzp1.open();
 
                         })
+                } else {
+                    function Wallet(params) {
+
+
+                        let lwallet = Number('<%=user?.wallet.toFixed(2)%>')
+                        let total = Number("<%=price.toFixed(2)%>")
+                        if (lwallet) {
+
+
+                            if (total <= lwallet) {
+                                // fetch("/new-order", { method: "POST", body: new URLSearchParams({ index: selectedValue, paymentType: "wallet", totalMRP: Total - discount }) })
+                                // .then(res => {
+                                //     if (res.status === 200) {
+                                //         window.location.replace("/account/orders")
+                                //     }
+                                // })
+                                document.getElementById("Ftotal").innerHTML = 0
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Remaining Amount',
+                                    text: `The remaining amount is ${total}`,
+                                    confirmButtonText: 'Continue'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        wallet = true
+                                        localStorage.removeItem("wallet")
+                                        fetch("/new-order", { method: "POST", body: new URLSearchParams({ index: selectedValue, paymentType: "wallet", totalMRP: Total, wallet, discountID }) })
+                                            .then(res => {
+                                                if (res.status === 200) {
+                                                    window.location.replace("/account/orders")
+                                                }
+                                            })
+                                    }
+                                });
+                            } else {
+                                document.getElementById("Ftotal").innerHTML = (total -= lwallet).toFixed(2)
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Payment Required',
+                                    text: `You must pay ${total} to proceed.`,
+                                    confirmButtonText: 'OK',
+                                    cancelButtonText: 'Cancel'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        wallet = true
+                                        document.getElementById("tick-img").classList.remove("hidden")
+                                        localStorage.setItem("wallet", true)
+
+
+
+                                    }
+                                    document.getElementById("chBut").classList.remove("hidden")
+                                    document.getElementById("spinnerCh").classList.add("hidden")
+                                });
+                            }
+                        } else {
+                            document.getElementById("chBut").classList.remove("hidden")
+                            document.getElementById("spinnerCh").classList.add("hidden")
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Empty Wallet',
+                                text: `Your wallet amount is currently zero. Please add funds to proceed.`,
+                                confirmButtonText: 'OK'
+                            });
+
+                        }
+
+
+
+                    }
+                    Wallet()
                 }
 
             }

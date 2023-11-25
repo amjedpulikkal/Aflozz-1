@@ -1,8 +1,9 @@
+
 const express = require("express")
 const router = express.Router()
 require('dotenv').config();
 const multer = require("multer")
-const { ifadmin, noadmin, sharp_pro, sharp_up, sharp_cat,sharp_not } = require("../model/aouth")
+const { ifadmin, noadmin, sharp_pro, sharp_up, sharp_cat,sharp_not, sharp_ban } = require("../model/aouth")
 const adminController = require("../controller/adminCoantroller")
 const productCantroller = require("../controller/productCoantroller")
 const categoryCantroller = require("../controller/categoryCantroller")
@@ -14,6 +15,7 @@ const upload = multer({ storage })
 
 router.get("/", ifadmin, adminController.getAdmin)
 router.get("/sales-report", ifadmin, adminController.getSalse)
+router.route("/banner").get(ifadmin,adminController.getBanner).post(ifadmin,upload.single("image"),sharp_ban,adminController.banner)
 router.post("/getReport", ifadmin, adminController.salseReport)
 router.route("/login", noadmin).get(adminController.getLogin).post(adminController.postLogin)
 
@@ -50,6 +52,7 @@ router.get("/orders",ifadmin,adminController.getOrder)
 router.get("/orders/return",ifadmin,adminController.returnOrder)
 router.get("/orders/:id",ifadmin,adminController.orderD)
 router.post("/orders/update/:id",ifadmin,adminController.updateOrder)
+router.post("/orders/update/return/:id",ifadmin,adminController.updateReturnOrder)
 
 
 router.post("/send",ifadmin ,upload.single("image"),sharp_not,adminController.send)

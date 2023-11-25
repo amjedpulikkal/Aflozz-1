@@ -3,14 +3,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
-   
         input[type="number"] {
             -moz-appearance: textfield;
             /* Firefox */
         }
 
         input[type="number"]::-webkit-inner-spin-button,
-        input[type="number"]::-webkit-outer-spin-button{
+        input[type="number"]::-webkit-outer-spin-button {
             -webkit-appearance: none;
             appearance: none;
         }
@@ -119,7 +118,7 @@
     </style>
 </head>
 
-<body class="bg-gray-100">
+<body class="bg-gray-100 mt-9">
     <div class="container mx-auto mt-10">
         <div class="flex shadow-md my-10">
             <div class="w-3/4 bg-white px-10 py-10">
@@ -131,6 +130,7 @@
                 </div>
                 <div class="flex mt-10 mb-5">
                     <h3 class="font-semibold text-gray-600 text-xs uppercase w-2/5">Product Details</h3>
+                    <!-- <h3 class="font-semibold  text-gray-600 text-xs uppercase w-1/5 text-center">Size</h3> -->
                     <h3 class="font-semibold  text-gray-600 text-xs uppercase w-1/5 text-center">Quantity</h3>
                     <h3 class="font-semibold  text-gray-600 text-xs uppercase w-1/5 text-center">Price</h3>
                     <h3 class="font-semibold  text-gray-600 text-xs uppercase w-1/5 text-center">Discount</h3>
@@ -155,37 +155,30 @@
                             </div>
                         </div>
                         <div class="flex justify-center w-1/5 pt-1">
-                            <!-- <select id="quantitySelect<%=i%>" data-product-id="<%=products[i]._id %>"
+                            <!-- <select id="sizeSelect<%=i%>" data-product-id="<%=products[i]._id %>"
                                 aria-label="Select quantity"
                                 class="border border-gray-200 mr-6 focus:outline-none text-black bg-white">
-                                <% for (let j=1; j <=5; j++) { %>
-                                    <% if (products[i].quantity===j) { %>
-                                        <option selected>
-                                            <%= j %>
-                                        </option>
-                                        <% } else { %>
-                                            <option>
-                                                <%= j %>
-                                            </option>
-                                            <% } %>
-                                                <% } %>
+                                <%products.size?.forEach(size=>{%>
+                                    <option><%=size%></option>
+                                  <%})%>
+                                  </select>
                             </select> -->
-                            <!-- <div class="qty-input">
-                                <button class="qty-count qty-count--minus" data-action="minus" type="button">-</button>
+                            <%console.log(products[i].stock)%>
+                            <div class="qty-input">
+                                <button class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow qty-count--minus" data-action="minus" type="button"  onclick="inc('<%=i%>')">-</button>
                                 <input id="quantitySelect<%=i%>"  data-product-id="<%=products[i]._id %>" class="product-qty" type="number" name="product-qty"
-                                    min="0" max="10" value="<%=products[i].quantity%>">
-                                <button class="qty-count qty-count--add" data-action="add" type="button">+</button>
-                            </div> -->
-                            <div class="flex items-center border-gray-100 " style="width: 100px;">
-                                <span onclick=""
-                                    class="cursor-pointer rounded-l bg-gray-200 py-1 px-3.5 duration-100 hover:bg-blue-500 hover:text-blue-50">
-                                    - </span>
-                                <input id="quantitySelect<%=i%>" class="h-8 w-8 border bg-white text-black text-center text-xs outline-none"
-                                    type="number" value="<%=products[i].quantity%>" min="1" readonly style="font-size: medium; " />
-                                <span onclick=""
-                                    class="cursor-pointer rounded-r bg-gray-200 py-1 px-3 duration-100 hover:bg-blue-500 hover:text-blue-50">
-                                    + </span>
+                                    min="1" max="<%=products[i].stock%>" value="<%=products[i].quantity%>">
+                                <button class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow qty-count--add" data-action="add" type="button" onclick="inc('<%=i%>')">+</button>
                             </div>
+                            <!-- <div class="flex items-center border-gray-100 " style="width: 100px;">
+                                <span
+                                    class="qty-count--minu qty-counts cursor-pointer rounded-l bg-gray-200 py-1 px-3.5 duration-100 hover:bg-blue-500 hover:text-blue-50">-</span>
+                                <input
+                                    class="product-qty h-8 w-8 border bg-white text-black text-center text-xs outline-none"
+                                    type="number" value="1" min="1" max="10" readonly style="font-size: medium; " />
+                                <span
+                                    class="qty-count--add qty-count cursor-pointer rounded-r bg-gray-200 py-1 px-3 duration-100 hover:bg-blue-500 hover:text-blue-50">+</span>
+                            </div> -->
                         </div>
                         <span class="text-center w-1/5 font-semibold text-sm">
                             <%=products[i].price%>
@@ -227,7 +220,7 @@
                     <div class="flex  justify-between py-6 text-sm uppercase">
                         <span>Discount on MRP</span>
                         <span id="F-d-MRP">
-                            <%=price%>
+                            <%=price.toFixed(2)%>
                         </span>
                     </div>
 
@@ -237,7 +230,7 @@
                     <div class="flex font-semibold justify-between py-6 text-sm uppercase">
                         <span>Total cost</span>
                         <span id="Ftotal">
-                            <%=price%>
+                            <%=price.toFixed(2)%>
                         </span>
                     </div>
                     <%if(products.length!==0){%>
@@ -269,7 +262,7 @@
             const qtyMin = parseInt(productQty.getAttribute("min"));
             const qtyMax = parseInt(productQty.getAttribute("max"));
 
-            
+
 
             productQty.addEventListener("change", function () {
                 const qty = parseInt(productQty.value);
@@ -327,6 +320,47 @@
 
 </script>
 <script>
+
+    function inc(i){
+        let selectElement = document.getElementById(`quantitySelect${i}`);
+        let price = document.getElementById(`price${i}`)
+        let total = Number(price.getAttribute("data-product-price")) * Number(selectElement.value)
+        let discount = Number(document.getElementById(`discount${i}`).innerText)
+        console.log(discount);
+        let dis = (total * discount) / 100
+        console.log(dis);
+        totalMRP += Number(price.getAttribute("data-product-price")) * Number(selectElement.value)
+        price.innerHTML = (total - dis).toFixed(2)
+        // Add an event listener to detect changes in the selected option
+        function incress() {
+
+        }
+
+
+ 
+            const selectedValue = selectElement.value;
+            if (discount === 0) {
+                price.innerHTML = Number(price.getAttribute("data-product-price")) * Number(selectElement.value)
+            } else {
+
+                console.log(discount);
+                let dis = (total * discount) / 100
+                console.log(dis);
+                price.innerHTML = (total - dis).toFixed(2)
+            }
+            const id = selectElement.getAttribute("data-product-id")
+            Total()
+            console.log(id);
+            console.log("------------------");
+            console.log(selectedValue);
+            fetch("/cart", { method: "POST", body: new URLSearchParams({ id, quantity: selectedValue }) }).then(n => {
+                console.log(n);
+
+                n.json().then(data => console.log(data))
+
+            })
+          
+    }
     function remove(id) {
 
         Swal.fire({
@@ -371,26 +405,25 @@
         let dis = (total * discount) / 100
         console.log(dis);
         totalMRP += Number(price.getAttribute("data-product-price")) * Number(selectElement.value)
-        price.innerHTML = total - dis
+        price.innerHTML = (total - dis).toFixed(2)
         // Add an event listener to detect changes in the selected option
-        function incress(){
+        function incress() {
 
         }
-        
 
-         function addToCart() {
+
+        function addToCart() {
             const selectedValue = selectElement.value;
             let total = Number(price.getAttribute("data-product-price")) * Number(selectElement.value)
             let discount = Number(document.getElementById(`discount${i}`).innerText)
             if (discount === 0) {
-
                 price.innerHTML = Number(price.getAttribute("data-product-price")) * Number(selectElement.value)
             } else {
 
                 console.log(discount);
                 let dis = (total * discount) / 100
                 console.log(dis);
-                price.innerHTML = total - dis
+                price.innerHTML = (total - dis).toFixed(2)
             }
             const id = selectElement.getAttribute("data-product-id")
             Total()
@@ -405,9 +438,9 @@
         }
     }
     console.log("total");
-    document.getElementById("F-MRP").innerHTML = totalMRP
+    document.getElementById("F-MRP").innerHTML = totalMRP.toFixed(2)
 
-    localStorage.setItem('totalMRP', JSON.stringify(totalMRP));
+    localStorage.setItem('totalMRP', JSON.stringify(totalMRP.toFixed(2)));
 
 
     function Total() {
@@ -415,14 +448,21 @@
         let TotalPrice = []
         const length = document.querySelectorAll(".itmes").length
         console.log(length);
-        for (let j = 0; j < length; j++) {
-            const price = document.getElementById(`price${j}`)
-            TotalPrice.push(Number(price.textContent))
-        }
+        if (!length) {
+            document.getElementById("TotalPrice").innerHTML = 0
+            document.getElementById("Ftotal").innerHTML = 0
+            document.getElementById("F-d-MRP").innerHTML = 0
+        } else {
 
-        document.getElementById("TotalPrice").innerHTML = TotalPrice.reduce((n, l) => n + l)
-        document.getElementById("Ftotal").innerHTML = (TotalPrice.reduce((n, l) => n + l))
-        document.getElementById("F-d-MRP").innerHTML = (TotalPrice.reduce((n, l) => n + l))
+            for (let j = 0; j < length; j++) {
+                const price = document.getElementById(`price${j}`)
+                TotalPrice.push(Number(price.textContent))
+            }
+
+            document.getElementById("F-MRP").innerHTML = (TotalPrice?.reduce((n, l) => n + l)).toFixed(2)
+            document.getElementById("Ftotal").innerHTML = (TotalPrice?.reduce((n, l) => n + l)).toFixed(2)
+            document.getElementById("F-d-MRP").innerHTML = (TotalPrice?.reduce((n, l) => n + l)).toFixed(2)
+        }
 
     }
 

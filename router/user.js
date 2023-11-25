@@ -26,6 +26,9 @@ router.post("/cart/:id",ifuser,userController.addToCart)
 router.get("/cart/remove/:id",ifuser,userController.cartRemove)
 router.post("/cart",ifuser,userController.incresCart)
 router.get("/cart/address",ifuser,userController.address)
+// router.post("/wallat",ifuser,userController.wallet)
+
+// router.post("/update-image/:id",ifuser,userController.updateImage)
 
 router.get("/account/profile",ifuser,userController.profil)
 router.post("/address",ifuser,userController.newAdress)
@@ -35,6 +38,7 @@ router.get("/address/remove/:index",ifuser,userController.addressRemove)
 
 
 router.post("/change/password",ifuser,userController.changePassword)
+router.post("/change/profil",ifuser,userController.changeProfil)
 
 router.get("/address/edit/:id",ifuser,userController.editAddress)
 router.get("/new-address",ifuser,userController.newAddress)
@@ -42,6 +46,7 @@ router.post("/new-order",ifuser,userController.newOrder)
 router.get("/order/cancel/:id",ifuser,userController.cancelOrder)
 router.post("/order/return/:id",ifuser,userController.returnOrder)
 router.get("/account",ifuser,userController.getAccount)
+router.route("/search").get(ifuser,userController.search).post(ifuser,userController.postSearch)
 
 
 router.post("/subscribe",ifuser,userController.webPush)

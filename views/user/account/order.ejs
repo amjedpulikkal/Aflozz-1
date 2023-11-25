@@ -26,7 +26,8 @@
                                 <h3 class="text-lg leading-6 font-medium text-gray-900">#Id</h3>
                                 <a href="/account/orders/details/<%=items._id%>">
                                     <p class="ms-2">
-                                        <%= items._id %>
+                                        <%= items.no ? items.no : items._id %>
+
                                     </p>
                                 </a>
                             </div>
@@ -87,7 +88,7 @@
                                                         <div style="width: 50%;"
                                                             class="order-tracking <%= (items.return.length >=1) ? 'completed' : '' %>" >
                                                             <span class="is-complete"></span>
-                                                            <p>Ordered<br><span>
+                                                            <p>Return<br><span>
                                                                     <%= (items.return[0]?.date) ? new Date(items.return[0]?.date).toISOString().split('T')[0]
                                                                         : '' %>
                                                                 </span></p>
